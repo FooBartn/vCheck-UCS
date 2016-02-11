@@ -20,14 +20,15 @@ Else
 }
 
 $Info = New-Object -TypeName PSObject -Property @{
-    "HA State" = $DomStatus.HaReadiness
     "Number of Chassis" = (@($Chassis).Count)
     "Number of Blades" = (@($Blades).Count)
     "Number of RackUnits" = (@($RackUnits).Count)
     "Number of Templates" = (@($SvcProfileTempls).Count)
     "Number of Profiles" = (@($SvcProfiles).Count)
     "UCSM FW" = (Get-UcsFirmwareInfra).OperVersion
-    "Primary Interconnect" = $FabPrimary   
+    "UCS Domain Name:" = $DomStatus.Name
+    "Primary Interconnect" = $FabPrimary
+    "HA State" = $DomStatus.HaReadiness   
 }
 
 $Info
