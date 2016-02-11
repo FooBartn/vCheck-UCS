@@ -1,15 +1,4 @@
-$Title = "UCS Fault Policy"
-$Header =  "UCS Fault Policy"
-$Comments = "Fault policy settings outside of the set preferred values"
-$Display = "List"
-$Author = "Joshua Barton"
-$PluginVersion = 1.0
-$PluginCategory = "UCS"
-
-
 # Start of Settings
-# Do you want to retain cleared faults?
-$RetainClearedFaults = $True
 # Minimum fault retention frequency (forever, days, hours, minutes, seconds):
 $MinRetentionFrequency = 'days'
 # Duration pertaining to retention frequency (ie, '7' days):
@@ -48,7 +37,8 @@ Function Compare-Value ($CurrentValue,$CompareType,$MatchingValue)
 }
 
 $ReportRetentionInt = $False
-$FaultPolTable = New-Object -TypeName PSObject
+$FaultPolDetails = New-Object -TypeName PSObject
+$FaultPolTable = @()
 $FaultPolicy = Get-UcsFaultPolicy
 $FaultRetentionInt = $FaultPolicy.RetentionInterval
 
@@ -91,12 +81,21 @@ Switch ($MinRetentionFrequency)
         
 If ($ReportRetentionInt)
 {
-    $FaultPolTable | Add-Member -Name "Retention Interval" -MemberType NoteProperty -Value "$DayRetentionValue Days, $HourRetentionValue Hours, $MinuteRetentionValue Minutes, $SecondRetentionValue Seconds"
-}
+    $Details = '' | Select Days, Hours, Minutes, Seconds
+    $Details.Days = $DayRetentionValue
+    $Details.Hours = $HourRetentionValue
+    $Details.Minutes = $MinuteRetentionValue
+    $Details.Seconds = $SecondRetentionValue
 
-If (Compare-Value $Fault.ClearAction 'ne' $RetainClearedFaults)
-{
-    $FaultPolTable | Add-Member -Name "Clear Faults Action" -MemberType NoteProperty -Value $($RetainClearedFaults)
+    $FaultPolTable += $Details
 }
 
 $FaultPolTable
+
+$Title = "UCS Fault Retention Policy"
+$Header =  "UCS Fault Retention Policy"
+$Comments = "Fault retention policy lower than $MinRetentionValue $MinRetentionFrequency"
+$Display = "Table"
+$Author = "Joshua Barton"
+$PluginVersion = 1.0
+$PluginCategory = "UCS"

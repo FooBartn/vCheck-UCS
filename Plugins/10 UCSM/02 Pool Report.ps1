@@ -9,6 +9,7 @@ Function Get-BlockDetails ($Blocks, $Pools, $Type) {
     Foreach ($Pool in $Pools)
     {
         $PercentUsed = $Pool.Assigned * 100 / $Pool.Size
+        $PoolDN = $Pool.Dn
         
         If ($PercentUsed -ge $PoolUsedLimit)
         {
@@ -19,10 +20,7 @@ Function Get-BlockDetails ($Blocks, $Pools, $Type) {
             $Details.Used = $Pool.Assigned
             $Details.PercentUsed = $PercentUsed 
             
-            Foreach ($Block in $Blocks)
-            {
-                $ThisBlock = $Blocks | Where {$_.Dn -eq "$($Pool.Dn)/$($Block.Rn)"}
-            }
+            $ThisBlock = $Blocks | Where {$_.Dn -like "$PoolDN/*"}
 
             $Details.From = $ThisBlock.From
             $Details.To = $ThisBlock.To
@@ -42,8 +40,8 @@ Get-BlockDetails $WwnBlocks $WwpnPools "WWPN"
 $script:PoolBlockTable
 
 $Title = "UCS Pool Report"
-$Header =  "Pools over $PoolUsedLimit percent used"
-$Comments = "Mac, WWPN, WWNN, UUID"
+$Header =  "UID Pools With High Utilization"
+$Comments = "Pools over $PoolUsedLimit percent used"
 $Display = "Table"
 $Author = "Joshua Barton"
 $PluginVersion = 1.0
