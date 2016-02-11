@@ -26,6 +26,8 @@ The following items are included as part of the vCheck UCS download, they are in
 
 Changelog
 =========
+* 1.3 - Fixed bug with Pool Report plugin. Added Example-Page.
+* 1.2 - Added Inactive Servers, Fault Retention Policy, and Switching Mode Plugins
 * 1.1 - Added Unused Enabled Ports and Modified VeryLastPlugin
 * 1.0 - Added Recent Faults, Pool Report, Unassociated Profiles plugins
 * 0.5 - Modified Connection and General Info plugins for UCS
