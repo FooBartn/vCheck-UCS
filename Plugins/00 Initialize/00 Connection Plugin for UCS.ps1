@@ -87,9 +87,9 @@ Finally
 Write-CustomOut $pLang.collectDomain
 $DomStatus = Get-UcsStatus
 Write-CustomOut $pLang.collectSp
-$SvcProfs = Get-UcsServiceProfile -Type instance | Sort Name
+$SvcProfiles = Get-UcsServiceProfile -Type instance | Sort Name
 Write-CustomOut $plang.collectSpTemplate
-$SvcProfTmpls = Get-UcsServiceProfile | Where-object {$_.UuidSuffix -eq '0000-000000000000'} | Sort Name
+$SvcProfileTempls = Get-UcsServiceProfile | Where-object {$_.UuidSuffix -eq '0000-000000000000'} | Sort Name
 Write-CustomOut $pLang.collectBlades
 $Blades = Get-UcsBlade | Sort Name
 Write-CustomOut $pLang.collectRackUnits
