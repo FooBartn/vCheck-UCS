@@ -23,6 +23,12 @@ The following items are included as part of the vCheck UCS download, they are in
 - UID Pool Usage (UUID,MAC,WWPN,WWNN)
 - Unassociated Profiles
 - Unused but Enabled Ports
+- Pool Usage
+- Inactive Servers
+- Switching Mode
+- Fault Retention
+
+For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
 
 Changelog
 =========
