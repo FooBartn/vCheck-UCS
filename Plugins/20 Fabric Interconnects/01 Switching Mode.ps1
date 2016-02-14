@@ -29,7 +29,7 @@ $UcsSwitchModeTable
 
 $Title = "Fabric Interconnect Switch Modes"
 $Header =  "Fabric Interconnect Switch Modes"
-$Comments = "Verify UCS Domain is running the correct switching modes. End-Host is standard."
+$Comments = "Preferred Switch Mode Settings -- Ethernet: $EthernetSwitchMode, FC: $FcSwitchMode"
 $Display = "Table"
 $Author = "Joshua Barton"
 $PluginVersion = 1.0

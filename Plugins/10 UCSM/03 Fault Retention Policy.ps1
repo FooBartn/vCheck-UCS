@@ -5,39 +5,7 @@ $MinRetentionFrequency = 'days'
 [int]$MinRetentionValue = 7
 # End of Settings
 
-Function Compare-Value ($CurrentValue,$CompareType,$MatchingValue)
-{
-    Switch ($CompareType)
-    {
-        'lt'
-        {
-            If ($CurrentValue -lt $MatchingValue)
-            {
-                Return $True
-            }
-            Else
-            {
-                Return $False
-            } 
-        }
-        
-        'ne'
-        {
-            If ($CurrentValue -ne $MatchingValue)
-            {
-                Return $True
-            }
-            Else
-            {
-                Return $False
-            }
-        }
-    }
-    
-}
-
 $ReportRetentionInt = $False
-$FaultPolDetails = New-Object -TypeName PSObject
 $FaultPolTable = @()
 $FaultPolicy = Get-UcsFaultPolicy
 $FaultRetentionInt = $FaultPolicy.RetentionInterval
@@ -55,27 +23,43 @@ Switch ($MinRetentionFrequency)
 {
     'forever'
     {
-        $ReportRetentionInt = Compare-Value $FaultRetentionInt 'ne' $MinRetentionFrequency
+        
+        If ($FaultRetentionInt -ne $MinRetentionFrequency)
+        {
+            $ReportRetentionInt = $True
+        }
     }
     
     'days'
     {
-        $ReportRetentionInt = Compare-Value $DayRetentionValue 'lt' $MinRetentionValue
+        If ($DayRetentionValue.CompareTo($MinRetentionValue) -eq -1)
+        {
+            $ReportRetentionInt = $True
+        }
     }
     
     'hours'
     {
-        $ReportRetentionInt = Compare-Value $HourRetentionValue 'lt' $MinRetentionValue
+        If ($HourRetentionValue.CompareTo($MinRetentionValue) -eq -1)
+        {
+            $ReportRetentionInt = $True
+        }
     }
     
     'minutes'
     {
-        $ReportRetentionInt = Compare-Value $MinuteRetentionValue 'lt' $MinRetentionValue
+        If ($MinuteRetentionValue.CompareTo($MinRetentionValue) -eq -1)
+        {
+            $ReportRetentionInt = $True
+        }
     }
     
     'seconds'
     {
-        $ReportRetentionInt = Compare-Value $SecondRetentionValue 'lt' $MinRetentionValue
+        If ($SecondRetentionValue.CompareTo($MinRetentionValue) -eq -1)
+        {
+            $ReportRetentionInt = $True
+        }
     }
 }
         

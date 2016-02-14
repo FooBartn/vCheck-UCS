@@ -20,20 +20,26 @@ The following items are included as part of the vCheck UCS download, they are in
 
 - General Details
 - Recent Faults
-- UID Pool Usage (UUID,MAC,WWPN,WWNN)
 - Unassociated Profiles
-- Unused but Enabled Ports
-- Pool Usage
-- Inactive Servers
+- Pool Report
+- Fault Retention Policy
+- Default Adapter Behavior
+- Non-Functioning Enabled Ports
 - Switching Mode
-- Fault Retention
+- Inactive Servers
+- Uplink Flow Control
+- LACP Policies
+- UDLP Policies
 
 For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
 
 Changelog
 =========
+* 1.6 - Added UDLP plugin. Cleaned up code in plugins.
+* 1.5 - Added Default Adapter Behavior and Uplink Flow Control plugins
+* 1.4 - Renamed Plugins. Fixed bug in Non-Functioning Enabled Ports.
 * 1.3 - Fixed bug with Pool Report plugin. Added Example-Page.
-* 1.2 - Added Inactive Servers, Fault Retention Policy, and Switching Mode Plugins
+* 1.2 - Added Inactive Servers, Fault Retention Policy, and Switching Mode plugins
 * 1.1 - Added Unused Enabled Ports and Modified VeryLastPlugin
 * 1.0 - Added Recent Faults, Pool Report, Unassociated Profiles plugins
 * 0.5 - Modified Connection and General Info plugins for UCS
