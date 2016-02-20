@@ -25,7 +25,7 @@ $LacpPolicyTable
 
 $Title = "LACP Policies"
 $Header =  "LACP Policies"
-$Comments = "Preferred LACP Settings -- Suspend Individual: $LacpSuspend, Preferred LACP Rate Setting: $LacpRate"
+$Comments = "Preferred LACP Settings -- Suspend Individual: $LacpSuspend, Rate: $LacpRate"
 $Display = "Table"
 $Author = "Joshua Barton"
 $PluginVersion = 1.0
