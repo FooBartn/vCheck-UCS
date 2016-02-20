@@ -25,8 +25,8 @@ $pLang = DATA {
       collectRackUnits = Collecting RackUnit Objects
       collectFi = Collecting Fabric Interconnect Objects
       collectPortLic = Collecting Port License Objects
-      collectFiPorts = Collecting FI Port Objects
-      collectFiPc = Collecting FI Port Channel Objects
+      collectFiEth = Collecting FI Ethernet Port Objects
+      collectFiSan = Collecting FI SAN Port Objects
       collectChassis = Collecting Chassis Objects
       collectFaults = Collecting Fault Objects
       collectFirmware = Collecting Infrastructure Firmware Object 
@@ -99,10 +99,12 @@ $FabricInterconnects = Get-UcsNetworkElement | Sort Name
 Write-CustomOut $pLang.collectPortLic
 $APortLicenses = Get-UcsLicense | Where {$_.Scope -eq 'A'}
 $BPortLicenses = Get-UcsLicense | Where {$_.Scope -eq 'B'}
-Write-CustomOut $pLang.collectFiPorts
-$EthPorts = Get-UcsFabricPort | Sort Rn
-Write-CustomOut $pLang.collectFiPc
-$EthPortChs = Get-UcsUplinkPortChannel
+Write-CustomOut $pLang.collectFiEth
+$UplinkPorts = Get-UcsUplinkPort | Sort Rn
+$UplinkPortChannels = Get-UcsUplinkPortChannel
+Write-CustomOut $pLang.collectFiSan
+$FcUplinkPorts = Get-UcsFcUplinkPort | Sort Rn
+$FcUplinkPortChannels = Get-UcsUplinkPortChannel
 Write-CustomOut $pLang.collectChassis
 $Chassis = Get-UcsChassis | Sort Rn
 Write-CustomOut $pLang.collectFaults
