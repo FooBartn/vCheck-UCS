@@ -37,6 +37,7 @@ For an example vCheck for UCS output (doesnt contain all info) click here [http:
 
 Changelog
 =========
+* 1.8 - Added Chassis Discovery Policy Plugin. Standardized Plugin Coding Style.
 * 1.7 - Added Maintenance and Default Pool Schema plugins. Renamed Pool Report to "High Pool Utilization" 
 * 1.6 - Added UDLP plugin. Cleaned up code in plugins.
 * 1.5 - Added Default Adapter Behavior and Uplink Flow Control plugins

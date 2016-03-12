@@ -6,7 +6,7 @@ $LinkAggregation = 'port-channel'
 # End of Settings
 
 $UcsChassisDiscTable = @()
-$UcsChassisDiscPolicy = Get-UcsTopInfoPolicy
+$UcsChassisDiscPolicy = Get-UcsChassisDiscoveryPolicy
 
 If($UcsChassisDiscPolicy.Action -ne $MinimumUplinksRequired -OR $UcsChassisDiscPolicy.LinkAggregationPref -ne $LinkAggregation) {
     $Details = '' | Select MinimumUplinksRequired, LinkAggregation
