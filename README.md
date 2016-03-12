@@ -21,7 +21,7 @@ The following items are included as part of the vCheck UCS download, they are in
 - General Details
 - Recent Faults
 - Unassociated Profiles
-- Pool Report
+- High Pool Utilization
 - Fault Retention Policy
 - Default Adapter Behavior
 - Non-Functioning Enabled Ports
@@ -30,11 +30,14 @@ The following items are included as part of the vCheck UCS download, they are in
 - Uplink Flow Control
 - LACP Policies
 - UDLP Policies
+- Maintenance Policies
+- Default Pool Schema
 
 For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
 
 Changelog
 =========
+* 1.7 - Added Maintenance and Default Pool Schema plugins. Renamed Pool Report to "High Pool Utilization" 
 * 1.6 - Added UDLP plugin. Cleaned up code in plugins.
 * 1.5 - Added Default Adapter Behavior and Uplink Flow Control plugins
 * 1.4 - Renamed Plugins. Fixed bug in Non-Functioning Enabled Ports.
