@@ -13,10 +13,8 @@ $UdlpPolicyTable = @()
 $UdlpPolicies = Get-UcsFabricUdldLinkPolicy
 $UdlpSettings = Get-UcsFabricUdldPolicy
 
-Foreach ($UdlpPolicy in $UdlpPolicies)
-{
-    If ($UdlpPolicy.AdminState -ne $UdlpState -OR $UdlpPolicy.Mode -ne $UdlpMode)
-    {
+Foreach ($UdlpPolicy in $UdlpPolicies) {
+    If ($UdlpPolicy.AdminState -ne $UdlpState -OR $UdlpPolicy.Mode -ne $UdlpMode) {
         $Details = '' | Select Policy, Location, State, Suspend, Rate, RecoveryAction, RecoveryInterval
         $Details.Policy = $UdlpPolicy.Name
         $Details.Location = $UdlpPolicy.Dn
@@ -24,8 +22,7 @@ Foreach ($UdlpPolicy in $UdlpPolicies)
         $Details.Suspend = $UdlpPolicy.SuspendIndividual
         $Details.Rate = $UdlpPolicy.FastTimer
         
-        If ($UdlpSettings.RecoveryAction -ne $UdlpRecoveryAction -OR $UdlpSettings.MsgInterval -ne $UdlpRecoveryInt)
-        {
+        If ($UdlpSettings.RecoveryAction -ne $UdlpRecoveryAction -OR $UdlpSettings.MsgInterval -ne $UdlpRecoveryInt) {
             $Details.RecoveryAction = $UdlpSettings.RecoveryAction
             $Details.RecoveryInterval = $UdlpSettings.MsgInterval
         }

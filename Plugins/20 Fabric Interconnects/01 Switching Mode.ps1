@@ -9,16 +9,14 @@ $UcsSwitchModeTable = @()
 $UcsLanCloud = Get-UcsLanCloud
 $UcsSanCloud = Get-UcsSanCloud 
 
-If($UcsLanCloud.Mode -ne $EthernetSwitchMode)
-{
+If($UcsLanCloud.Mode -ne $EthernetSwitchMode) {
     $Details = '' | Select TrafficType, Mode
     $Details.TrafficType = $UcsLanCloud.Rn
     $Details.Mode = $UcsLanCloud.Mode
     $UcsSwitchModeTable += $Details    
 }
 
-If($UcsSanCloud.Mode -ne $FcSwitchMode)
-{
+If($UcsSanCloud.Mode -ne $FcSwitchMode) {
     $Details = '' | Select TrafficType, Mode
     $Details.TrafficType = $UcsSanCloud.Rn
     $Details.Mode = $UcsSanCloud.Mode

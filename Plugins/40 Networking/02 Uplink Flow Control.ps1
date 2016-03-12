@@ -9,15 +9,13 @@ $SendFlowCtrl = 'on'
 
 $FlowCtrlTable = @()
 
-Foreach ($UplinkPort in $UplinkPorts)
-{
+Foreach ($UplinkPort in $UplinkPorts) {
     $FlowCtrlPolicy = Get-UcsFlowctrlItem -Name $UplinkPort.FlowCtrlPolicy
     $SndFlowPolicy = $FlowCtrlPolicy.Snd
     $RcvFlowPolicy = $FlowCtrlPolicy.Rcv
     $PrioFlowPolicy = $FlowCtrlPolicy.Prio
     
-    If ($PrioFlowPolicy -ne $PriorityFlowCtrl -OR $SndFlowPolicy -ne $SendFlowCtrl -OR $RcvFlowPolicy -ne $ReceiveFlowCtrl)
-    {
+    If ($PrioFlowPolicy -ne $PriorityFlowCtrl -OR $SndFlowPolicy -ne $SendFlowCtrl -OR $RcvFlowPolicy -ne $ReceiveFlowCtrl) {
         $Details = '' | Select Port, Policy, PFC, Send, Receive
         $Details.Port = $UplinkPort.Rn
         $Details.Policy = $FlowCtrlPolicy.Name

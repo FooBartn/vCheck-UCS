@@ -6,8 +6,7 @@ $InfoPolicyState = 'enabled'
 $UcsInfoPolTable = @()
 $UcsInfoPolicy = Get-UcsTopInfoPolicy
 
-If($UcsInfoPolicy.State -ne $InfoPolicyState)
-{
+If($UcsInfoPolicy.State -ne $InfoPolicyState) {
     $Details = '' | Select Name, State
     $Details.Name = $UcsInfoPolicy.Rn
     $Details.State = $UcsInfoPolicy.State

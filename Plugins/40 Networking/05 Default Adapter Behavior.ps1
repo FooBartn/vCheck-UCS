@@ -9,16 +9,14 @@ $AdapterPolicyTable = @()
 $VnicBehPolicy = Get-UcsVnicVnicBehPolicy
 $VhbaBehPolicy = Get-UcsVnicVhbaBehPolicy
 
-If ($VnicBehPolicy.Action -ne $ReqVnicBehavior)
-{
+If ($VnicBehPolicy.Action -ne $ReqVnicBehavior) {
     $Details = '' | Select Policy, Action
     $Details.Policy = $VnicBehPolicy.Name
     $Details.Action = $VnicBehPolicy.Action
     $AdapterPolicyTable += $Details
 }
 
-If ($VhbaBehPolicy.Action -ne $ReqVhbaBehavior)
-{
+If ($VhbaBehPolicy.Action -ne $ReqVhbaBehavior) {
     $Details = '' | Select Policy, Action
     $Details.Policy = $VhbaBehPolicy.Name
     $Details.Action = $VhbaBehPolicy.Action

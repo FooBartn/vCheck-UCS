@@ -6,10 +6,8 @@ $MacForging = 'deny'
 $PortSecurityTable = @()
 $PortSecurityPolicies = Get-UcsPortSecurityConfig
 
-Foreach ($PortSecurityPolicy in $PortSecurityPolicies)
-{
-    If ($PortSecurityPolicy.Cdp -ne $CdpState)
-    {
+Foreach ($PortSecurityPolicy in $PortSecurityPolicies) {
+    If ($PortSecurityPolicy.Cdp -ne $CdpState) {
         $Details = '' | Select Policy, Location, MacForging
         $Details.Policy = $PortSecurityPolicy.Rn
         $Details.Location = $PortSecurityPolicy.Dn

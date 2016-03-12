@@ -6,10 +6,8 @@ $UptimeDisruption = 'user-ack'
 $MaintenancePolicyTable = @()
 $MaintenancePolicies = Get-UcsMaintenancePolicy
 
-Foreach ($MaintenancePolicy in $MaintenancePolicies)
-{
-    If ($MaintenancePolicy.UptimeDisr -ne $UptimeDisruption)
-    {
+Foreach ($MaintenancePolicy in $MaintenancePolicies) {
+    If ($MaintenancePolicy.UptimeDisr -ne $UptimeDisruption) {
         $Details = '' | Select Policy, Location, UptimeDisruption
         $Details.Policy = $MaintenancePolicy.Name
         $Details.Location = $MaintenancePolicy.Dn

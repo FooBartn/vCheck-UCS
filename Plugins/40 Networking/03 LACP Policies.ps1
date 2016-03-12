@@ -8,10 +8,8 @@ $LacpRate = 'normal'
 $LacpPolicyTable = @()
 $LacpPolicies = Get-UcsFabricLacpPolicy
 
-Foreach ($LacpPolicy in $LacpPolicies)
-{
-    If ($LacpPolicy.FastTimer -ne $LacpRate -OR $LacpPolicy.SuspendIndividual -ne $LacpSuspend)
-    {
+Foreach ($LacpPolicy in $LacpPolicies) {
+    If ($LacpPolicy.FastTimer -ne $LacpRate -OR $LacpPolicy.SuspendIndividual -ne $LacpSuspend) {
         $Details = '' | Select Policy, Location, Suspend, Rate
         $Details.Policy = $LacpPolicy.Name
         $Details.Location = $LacpPolicy.Dn

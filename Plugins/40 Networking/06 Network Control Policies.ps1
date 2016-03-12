@@ -10,11 +10,9 @@ $UplinkFailureAction = 'link-down'
 $NetCtrlPolicyTable = @()
 $NetCtrlPolicies = Get-UcsNetworkControlPolicy
 
-Foreach ($NetCtrlPolicy in $NetCtrlPolicies)
-{
+Foreach ($NetCtrlPolicy in $NetCtrlPolicies) {
     
-    If ($NetCtrlPolicy.Cdp -ne $CdpState -OR $NetCtrlPolicy.MacRegisterMode -ne $MacRegisterMode -OR $NetCtrlPolicy.UplinkFailAction -ne $UplinkFailureAction)
-    {
+    If ($NetCtrlPolicy.Cdp -ne $CdpState -OR $NetCtrlPolicy.MacRegisterMode -ne $MacRegisterMode -OR $NetCtrlPolicy.UplinkFailAction -ne $UplinkFailureAction) {
         $Details = '' | Select Policy, Location, Cdp, MacRegisterMode, UplinkFailureAction
         $Details.Policy = $NetCtrlPolicy.Name
         $Details.Location = $NetCtrlPolicy.Dn
