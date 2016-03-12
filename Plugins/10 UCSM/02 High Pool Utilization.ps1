@@ -39,7 +39,7 @@ Get-BlockDetails $WwnBlocks $WwpnPools "WWPN"
 # Output PSObject back to vCheck
 $script:PoolBlockTable
 
-$Title = "UCS Pool Report"
+$Title = "High Pool Utilization"
 $Header =  "UID Pools With High Utilization"
 $Comments = "Pools over $PoolUsedLimit percent used"
 $Display = "Table"
