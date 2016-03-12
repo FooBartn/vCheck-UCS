@@ -32,6 +32,7 @@ The following items are included as part of the vCheck UCS download, they are in
 - UDLP Policies
 - Maintenance Policies
 - Default Pool Schema
+- Chassis Discovery Policy
 
 For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
 
