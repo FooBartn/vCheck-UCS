@@ -33,11 +33,14 @@ The following items are included as part of the vCheck UCS download, they are in
 - Maintenance Policies
 - Default Pool Schema
 - Chassis Discovery Policy
+- Power Policy
+- SEL Policy
 
 For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
 
 Changelog
 =========
+* 1.9 - Added Power Policy and SEL Policy plugins.
 * 1.8 - Added Chassis Discovery Policy Plugin. Standardized Plugin Coding Style.
 * 1.7 - Added Maintenance and Default Pool Schema plugins. Renamed Pool Report to "High Pool Utilization" 
 * 1.6 - Added UDLP plugin. Cleaned up code in plugins.
