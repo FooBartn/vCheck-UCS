@@ -18,23 +18,26 @@ What is checked for in the UCS version ?
 
 The following items are included as part of the vCheck UCS download, they are included as vCheck Plugins and can be removed or altered very easily by editing the specific plugin file which contains the data.  vCheck Plugins are found under the Plugins folder.
 
-- General Details
+- General Information
 - Recent Faults
 - Unassociated Profiles
 - High Pool Utilization
 - Fault Retention Policy
-- Default Adapter Behavior
-- Non-Functioning Enabled Ports
-- Switching Mode
-- Inactive Servers
-- Uplink Flow Control
-- LACP Policies
-- UDLP Policies
 - Maintenance Policies
 - Default Pool Schema
+- Enabled Non-Functioning Ports
+- Switching Mode
+- Info Policy
+- Inactive Servers
 - Chassis Discovery Policy
 - Power Policy
 - SEL Policy
+- Uplink Flow Control
+- LACP Policies
+- UDLD Link Policy
+- Link Protocol Policy
+- Network Control Policies
+- Default Adapter Behavior
 - Mac Security
 
 For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
