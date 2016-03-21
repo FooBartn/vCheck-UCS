@@ -35,11 +35,13 @@ The following items are included as part of the vCheck UCS download, they are in
 - Chassis Discovery Policy
 - Power Policy
 - SEL Policy
+- Mac Security
 
 For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
 
 Changelog
 =========
+* 2.0 - Major Plugin Optimizations and Bug Fixes. Split UDLD Policies into two plugins.
 * 1.9 - Added Power Policy and SEL Policy plugins.
 * 1.8 - Added Chassis Discovery Policy Plugin. Standardized Plugin Coding Style.
 * 1.7 - Added Maintenance and Default Pool Schema plugins. Renamed Pool Report to "High Pool Utilization" 

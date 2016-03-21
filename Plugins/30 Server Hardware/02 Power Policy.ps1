@@ -7,7 +7,8 @@ $UcsPowerPolicyTable = @()
 $UcsPowerPolicy = Get-UcsPowerControlPolicy
 
 If($UcsPowerPolicy.Redundancy -ne $PowerRedundancy) {
-    $Details = '' | Select Redundancy
+    $Details = '' | Select Name, Redundancy
+    $Details.Name = $UcsPowerPolicy.Name
     $Details.Redundancy = $UcsPowerPolicy.Redundancy
     $UcsPowerPolicyTable += $Details    
 }

@@ -7,7 +7,7 @@ $PortSecurityTable = @()
 $PortSecurityPolicies = Get-UcsPortSecurityConfig
 
 Foreach ($PortSecurityPolicy in $PortSecurityPolicies) {
-    If ($PortSecurityPolicy.Cdp -ne $CdpState) {
+    If ($PortSecurityPolicy.Forge -ne $MacForging) {
         $Details = '' | Select Policy, Location, MacForging
         $Details.Policy = $PortSecurityPolicy.Rn
         $Details.Location = $PortSecurityPolicy.Dn

@@ -14,7 +14,7 @@ $SelInterval = '1 hour'
 # End of Settings
 
 # Create Hash Table for Comparison
-$SettingsHashTable = @{
+$SelSettingsHashTable = @{
     Proto = $SelProtocol
     Hostname = $RemoteSelStorage
     RemotePath = $RemoteSelPath
@@ -29,9 +29,9 @@ $ActionList = ''
 $UcsSelPolicy = Get-UcsSysdebugBackupBehavior
 
 # Use keys in hash table to compare expected data to actual data
-Foreach ($Setting in $SettingsHashTable.Keys) {
+Foreach ($Setting in $SelSettingsHashTable.Keys) {
     # If the actual value is not equal to the expected value -->
-    If ($UcsSelPolicy.$Setting -ne $SettingsHashTable.$Setting) {
+    If ($UcsSelPolicy.$Setting -ne $SelSettingsHashTable.$Setting) {
         # Action is an array, so we're turning it into a comma delimited string for output
         If ($Setting -eq 'Action') {
             Foreach ($SettingProperty in $UcsSelPolicy.$Setting) {

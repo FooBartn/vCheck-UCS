@@ -5,17 +5,25 @@ $MinimumUplinksRequired = '4'
 $LinkAggregation = 'port-channel'
 # End of Settings
 
-$UcsChassisDiscTable = @()
-$UcsChassisDiscPolicy = Get-UcsChassisDiscoveryPolicy
-
-If($UcsChassisDiscPolicy.Action -ne $MinimumUplinksRequired -OR $UcsChassisDiscPolicy.LinkAggregationPref -ne $LinkAggregation) {
-    $Details = '' | Select MinimumUplinksRequired, LinkAggregation
-    $Details.MinimumUplinksRequired = $UcsChassisDiscPolicy.Action
-    $Details.LinkAggregation = $UcsChassisDiscPolicy.LinkAggregationPref
-    $UcsChassisDiscTable += $Details    
+# Create Hash Table for Comparison
+$DiscSettingsHashTable = @{
+    Action = $MinimumUplinksRequired
+    LinkAggregationPref = $LinkAggregation
 }
 
-$UcsChassisDiscTable
+# Initialize variables
+$UcsChassisDiscPolicy = Get-UcsChassisDiscoveryPolicy
+
+# Use keys in hash table to compare expected data to actual data
+Foreach ($Setting in $DiscSettingsHashTable.Keys) {
+    $BadDiscSettings = '' | Select Action, LinkAggregationPref
+    If ($UcsChassisDiscPolicy.$Setting -ne $DiscSettingsHashTable.$Setting) {
+        # Add property and value to object
+        $BadDiscSettings.$Setting = $UcsChassisDiscPolicy.$Setting
+    }
+}
+
+$BadDiscSettings
 
 $Title = "Chassis/FEX Discovery Policy"
 $Header =  "Chassis/FEX Discovery Policy"

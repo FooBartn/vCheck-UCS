@@ -7,21 +7,30 @@ $MacRegisterMode = 'only-native-vlan'
 $UplinkFailureAction = 'link-down'
 # End of Settings 
 
+# Create Hash Table for Comparison
+$NetCtrlPolicyHash = @{
+    Cdp = $CdpState
+    MacRegisterMode = $MacRegisterMode
+    UplinkFailAction = $UplinkFailureAction
+}
+
 $NetCtrlPolicyTable = @()
 $NetCtrlPolicies = Get-UcsNetworkControlPolicy
 
+
 Foreach ($NetCtrlPolicy in $NetCtrlPolicies) {
-    
-    If ($NetCtrlPolicy.Cdp -ne $CdpState -OR $NetCtrlPolicy.MacRegisterMode -ne $MacRegisterMode -OR $NetCtrlPolicy.UplinkFailAction -ne $UplinkFailureAction) {
-        $Details = '' | Select Policy, Location, Cdp, MacRegisterMode, UplinkFailureAction
-        $Details.Policy = $NetCtrlPolicy.Name
-        $Details.Location = $NetCtrlPolicy.Dn
-        $Details.Cdp = $NetCtrlPolicy.Cdp
-        $Details.MacRegisterMode = $NetCtrlPolicy.MacRegisterMode
-        $Details.UplinkFailureAction = $NetCtrlPolicy.UplinkFailAction
+    # Use keys in hash table to compare expected data to actual data
+    Foreach ($Setting in $NetCtrlPolicyHash.Keys) {
+        $BadNetCtrlSettings = '' | Select Name, Cdp, MacRegisterMode, UplinkFailAction
+        If ($NetCtrlPolicy.$Setting -ne $NetCtrlPolicyHash.$Setting) {
+            $BadNetCtrlSettings.$Setting = $netCtrlPolicy.$Setting
+        }
+    }
+    # If detail object is not null, define port and add it to the array
+    If ($Details) {
+        $Details.Name = $NetCtrlPolicy.Name
         $NetCtrlPolicyTable += $Details
     }
-}
 
 $NetCtrlPolicyTable
 
