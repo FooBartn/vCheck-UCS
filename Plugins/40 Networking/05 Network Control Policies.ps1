@@ -21,15 +21,15 @@ $NetCtrlPolicies = Get-UcsNetworkControlPolicy
 Foreach ($NetCtrlPolicy in $NetCtrlPolicies) {
     # Use keys in hash table to compare expected data to actual data
     Foreach ($Setting in $NetCtrlPolicyHash.Keys) {
-        $Details = '' | Select Name, Cdp, MacRegisterMode, UplinkFailAction
+        $BadNetCtrlSettings = '' | Select Name, Cdp, MacRegisterMode, UplinkFailAction
         If ($NetCtrlPolicy.$Setting -ne $NetCtrlPolicyHash.$Setting) {
             $BadNetCtrlSettings.$Setting = $netCtrlPolicy.$Setting
         }
     }
     # If detail object is not null, define port and add it to the array
-    If ($Details) {
-        $Details.Name = $NetCtrlPolicy.Name
-        $NetCtrlPolicyTable += $Details
+    If ($BadNetCtrlSettings) {
+        $BadNetCtrlSettings.Name = $NetCtrlPolicy.Name
+        $NetCtrlPolicyTable += $BadNetCtrlSettings
     }
 }
 
