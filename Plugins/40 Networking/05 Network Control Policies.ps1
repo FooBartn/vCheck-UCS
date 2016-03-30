@@ -23,7 +23,7 @@ Foreach ($NetCtrlPolicy in $NetCtrlPolicies) {
     Foreach ($Setting in $NetCtrlPolicyHash.Keys) {
         $BadNetCtrlSettings = '' | Select Name, Cdp, MacRegisterMode, UplinkFailAction
         If ($NetCtrlPolicy.$Setting -ne $NetCtrlPolicyHash.$Setting) {
-            $BadNetCtrlSettings.$Setting = $netCtrlPolicy.$Setting
+            $BadNetCtrlSettings.$Setting = $NetCtrlPolicy.$Setting
         }
     }
     # If detail object is not null, define port and add it to the array
