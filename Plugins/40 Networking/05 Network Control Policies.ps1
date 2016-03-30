@@ -21,7 +21,7 @@ $NetCtrlPolicies = Get-UcsNetworkControlPolicy
 Foreach ($NetCtrlPolicy in $NetCtrlPolicies) {
     # Use keys in hash table to compare expected data to actual data
     Foreach ($Setting in $NetCtrlPolicyHash.Keys) {
-        $BadNetCtrlSettings = '' | Select Name, Cdp, MacRegisterMode, UplinkFailAction
+        $Details = '' | Select Name, Cdp, MacRegisterMode, UplinkFailAction
         If ($NetCtrlPolicy.$Setting -ne $NetCtrlPolicyHash.$Setting) {
             $BadNetCtrlSettings.$Setting = $netCtrlPolicy.$Setting
         }
@@ -31,6 +31,7 @@ Foreach ($NetCtrlPolicy in $NetCtrlPolicies) {
         $Details.Name = $NetCtrlPolicy.Name
         $NetCtrlPolicyTable += $Details
     }
+}
 
 $NetCtrlPolicyTable
 
