@@ -13,6 +13,13 @@ One of they key things about this report is if there is no issue in a particular
 
 This script is not to be confused with an Audit script, although the reporting framework can also be used for auditing scripts too.  I don't want to remind you that you have 5 hosts and what there names are and how many CPUs they have each and every day as you don't want to read that kind of information unless you need it, this script will only tell you about problem areas with your infrastructure.
 
+
+Requirements to Run:
+========================
+PowerShell v3+
+Cisco UCS Manager PowerTool v2.x+
+
+
 What is checked for in the UCS version ?
 ============================================
 
@@ -44,6 +51,7 @@ For an example vCheck for UCS output (doesnt contain all info) click here [http:
 
 Changelog
 =========
+* 2.0.1 - Variable mistype in Network Control Policies. Added Requirements to README.
 * 2.0 - Major Plugin Optimizations and Bug Fixes. Split UDLD Policies into two plugins.
 * 1.9 - Added Power Policy and SEL Policy plugins.
 * 1.8 - Added Chassis Discovery Policy Plugin. Standardized Plugin Coding Style.
