@@ -10,8 +10,7 @@ $FaultPolTable = @()
 $FaultPolicy = Get-UcsFaultPolicy
 $FaultRetentionInt = $FaultPolicy.RetentionInterval
 
-If ($FaultRetentionInt -ne 'forever')
-{
+If ($FaultRetentionInt -ne 'forever') {
     $SplitFaultRetention = $FaultRetentionInt.Split(":")
     [int]$DayRetentionValue = $SplitFaultRetention | Select -Index 0
     [int]$HourRetentionValue = $SplitFaultRetention | Select -Index 1
@@ -19,52 +18,40 @@ If ($FaultRetentionInt -ne 'forever')
     [int]$SecondRetentionValue = $SplitFaultRetention | Select -Index 3
 }
 
-Switch ($MinRetentionFrequency)
-{
-    'forever'
-    {
+Switch ($MinRetentionFrequency) {
+    'forever' {
         
-        If ($FaultRetentionInt -ne $MinRetentionFrequency)
-        {
+        If ($FaultRetentionInt -ne $MinRetentionFrequency) {
             $ReportRetentionInt = $True
         }
     }
     
-    'days'
-    {
-        If ($DayRetentionValue.CompareTo($MinRetentionValue) -eq -1)
-        {
+    'days' {
+        If ($DayRetentionValue.CompareTo($MinRetentionValue) -eq -1) {
             $ReportRetentionInt = $True
         }
     }
     
-    'hours'
-    {
-        If ($HourRetentionValue.CompareTo($MinRetentionValue) -eq -1)
-        {
+    'hours' {
+        If ($HourRetentionValue.CompareTo($MinRetentionValue) -eq -1) {
             $ReportRetentionInt = $True
         }
     }
     
-    'minutes'
-    {
-        If ($MinuteRetentionValue.CompareTo($MinRetentionValue) -eq -1)
-        {
+    'minutes' {
+        If ($MinuteRetentionValue.CompareTo($MinRetentionValue) -eq -1) {
             $ReportRetentionInt = $True
         }
     }
     
-    'seconds'
-    {
-        If ($SecondRetentionValue.CompareTo($MinRetentionValue) -eq -1)
-        {
+    'seconds' {
+        If ($SecondRetentionValue.CompareTo($MinRetentionValue) -eq -1) {
             $ReportRetentionInt = $True
         }
     }
 }
         
-If ($ReportRetentionInt)
-{
+If ($ReportRetentionInt) {
     $Details = '' | Select Days, Hours, Minutes, Seconds
     $Details.Days = $DayRetentionValue
     $Details.Hours = $HourRetentionValue

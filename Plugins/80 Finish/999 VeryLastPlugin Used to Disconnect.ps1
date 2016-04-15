@@ -2,8 +2,7 @@
 # End of Settings
  
 # Everything in this script will run at the end of vCheck
-If ($UcsConnection) 
-{
+If ($UcsConnection) {
     Disconnect-Ucs -Ucs $UcsConnection
 }
 

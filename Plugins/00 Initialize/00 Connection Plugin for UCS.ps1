@@ -49,17 +49,13 @@ $pLang = DATA {
 Import-LocalizedData -BaseDirectory ($ScriptPath + "\lang") -BindingVariable pLang -ErrorAction SilentlyContinue
 
 # Load UCS Powertool Module 
-If (!(Get-Module -name CiscoUcsPS -ErrorAction SilentlyContinue)) 
-{
+If (!(Get-Module -name CiscoUcsPS -ErrorAction SilentlyContinue)) {
     Import-Module CiscoUcsPs
     
-    If (!(Get-Module -name CiscoUcsPS -ErrorAction SilentlyContinue))
-    {
+    If (!(Get-Module -name CiscoUcsPS -ErrorAction SilentlyContinue)) {
 		Write-Error $pLang.loadModFailed
 		Throw
-    }
-    Else
-    {
+    } Else {
         Write-CustomOut $pLang.LoadModSuccess
     }
 }
@@ -68,18 +64,12 @@ If (!(Get-Module -name CiscoUcsPS -ErrorAction SilentlyContinue))
 Disconnect-Ucs
 
 # Try connecting to specified domain
-Try 
-{
+Try {
     $UcsConnection = Connect-Ucs $UcsDomain -ErrorAction Stop
-} 
-Catch
-{
+} Catch {
     Write-Error $pLang.connError
-}
-Finally
-{
-    If ($UcsConnection)
-    {
+} Finally {
+    If ($UcsConnection) {
         Write-CustomOut $pLang.connOpen
     }
 }

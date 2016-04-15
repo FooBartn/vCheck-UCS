@@ -10,12 +10,9 @@ $PluginCategory = "UCS"
 # End of Settings 
 
 
-If ($DomStatus.FiALeadership -eq "primary")
-{
+If ($DomStatus.FiALeadership -eq "primary") {
 	$FabPrimary = "A"
-}
-Else
-{
+} Else {
 	$FabPrimary = "B"
 }
 

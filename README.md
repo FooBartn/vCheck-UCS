@@ -13,28 +13,49 @@ One of they key things about this report is if there is no issue in a particular
 
 This script is not to be confused with an Audit script, although the reporting framework can also be used for auditing scripts too.  I don't want to remind you that you have 5 hosts and what there names are and how many CPUs they have each and every day as you don't want to read that kind of information unless you need it, this script will only tell you about problem areas with your infrastructure.
 
+
+Requirements to Run:
+========================
+PowerShell v3+
+Cisco UCS Manager PowerTool v2.x+
+
+
 What is checked for in the UCS version ?
 ============================================
 
 The following items are included as part of the vCheck UCS download, they are included as vCheck Plugins and can be removed or altered very easily by editing the specific plugin file which contains the data.  vCheck Plugins are found under the Plugins folder.
 
-- General Details
+- General Information
 - Recent Faults
 - Unassociated Profiles
-- Pool Report
+- High Pool Utilization
 - Fault Retention Policy
-- Default Adapter Behavior
-- Non-Functioning Enabled Ports
+- Maintenance Policies
+- Default Pool Schema
+- Enabled Non-Functioning Ports
 - Switching Mode
+- Info Policy
 - Inactive Servers
+- Chassis Discovery Policy
+- Power Policy
+- SEL Policy
 - Uplink Flow Control
 - LACP Policies
-- UDLP Policies
+- UDLD Link Policy
+- Link Protocol Policy
+- Network Control Policies
+- Default Adapter Behavior
+- Mac Security
 
 For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
 
 Changelog
 =========
+* 2.0.1 - Variable mistype in Network Control Policies. Added Requirements to README.
+* 2.0 - Major Plugin Optimizations and Bug Fixes. Split UDLD Policies into two plugins.
+* 1.9 - Added Power Policy and SEL Policy plugins.
+* 1.8 - Added Chassis Discovery Policy Plugin. Standardized Plugin Coding Style.
+* 1.7 - Added Maintenance and Default Pool Schema plugins. Renamed Pool Report to "High Pool Utilization" 
 * 1.6 - Added UDLP plugin. Cleaned up code in plugins.
 * 1.5 - Added Default Adapter Behavior and Uplink Flow Control plugins
 * 1.4 - Renamed Plugins. Fixed bug in Non-Functioning Enabled Ports.

@@ -8,10 +8,8 @@ $LacpRate = 'normal'
 $LacpPolicyTable = @()
 $LacpPolicies = Get-UcsFabricLacpPolicy
 
-Foreach ($LacpPolicy in $LacpPolicies)
-{
-    If ($LacpPolicy.FastTimer -ne $LacpRate -OR $LacpPolicy.SuspendIndividual -ne $LacpSuspend)
-    {
+Foreach ($LacpPolicy in $LacpPolicies) {
+    If ($LacpPolicy.FastTimer -ne $LacpRate -OR $LacpPolicy.SuspendIndividual -ne $LacpSuspend) {
         $Details = '' | Select Policy, Location, Suspend, Rate
         $Details.Policy = $LacpPolicy.Name
         $Details.Location = $LacpPolicy.Dn
@@ -25,7 +23,7 @@ $LacpPolicyTable
 
 $Title = "LACP Policies"
 $Header =  "LACP Policies"
-$Comments = "Preferred LACP Settings -- Suspend Individual: $LacpSuspend, Preferred LACP Rate Setting: $LacpRate"
+$Comments = "Preferred LACP Settings -- Suspend Individual: $LacpSuspend, Rate: $LacpRate"
 $Display = "Table"
 $Author = "Joshua Barton"
 $PluginVersion = 1.0
