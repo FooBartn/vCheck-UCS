@@ -46,11 +46,13 @@ The following items are included as part of the vCheck UCS download, they are in
 - Network Control Policies
 - Default Adapter Behavior
 - Mac Security
+- Pool Assignment Order
 
 For an example vCheck for UCS output (doesnt contain all info) click here [http://www.foobartn.com/assets/examples/example-report.html](http://www.foobartn.com/assets/examples/example-report.html)
 
 Changelog
 =========
+* 2.0.5 - Added Pool Assignment Order plugin.
 * 2.0.4 - Network Control Policies plugin now checks to see where policies are in use
 * 2.0.3 - Added Port Channels to Uplink Flow Control plugin.
 * 2.0.2 - LACP Policies plugin now only checks for in-use policies.
