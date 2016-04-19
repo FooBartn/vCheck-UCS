@@ -16,8 +16,8 @@ This script is not to be confused with an Audit script, although the reporting f
 
 Requirements to Run:
 ========================
-PowerShell v3+
-Cisco UCS Manager PowerTool v2.x+
+- PowerShell v3+
+- Cisco UCS Manager PowerTool v2.x+
 
 
 What is checked for in the UCS version ?
@@ -51,6 +51,9 @@ For an example vCheck for UCS output (doesnt contain all info) click here [http:
 
 Changelog
 =========
+* 2.0.4 - Network Control Policies plugin now checks to see where policies are in use
+* 2.0.3 - Added Port Channels to Uplink Flow Control plugin.
+* 2.0.2 - LACP Policies plugin now only checks for in-use policies.
 * 2.0.1 - Variable mistype in Network Control Policies. Added Requirements to README.
 * 2.0 - Major Plugin Optimizations and Bug Fixes. Split UDLD Policies into two plugins.
 * 1.9 - Added Power Policy and SEL Policy plugins.
