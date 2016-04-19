@@ -16,14 +16,14 @@ $UdldProtoPolicy = Get-UcsFabricUdldPolicy
 
 # Use keys in hash table to compare expected data to actual data
 Foreach ($Setting in $UdldProtoPolicyHash.Keys) {
-    $BadUdldProtoSettings = '' | Select RecoveryAction, MsgInterval
+    $Details = '' | Select RecoveryAction, MsgInterval
     If ($UdldProtoPolicy.$Setting -ne $UdldProtoPolicyHash.$Setting) {
         # Add property and value to object
-        $BadUdldProtoSettings.$Setting = $UdldProtoPolicy.$Setting
+        $Details.$Setting = $UdldProtoPolicy.$Setting
     }
 }
 
-$BadUdldProtoSettings 
+$Details
 
 $Title = "UDLD Protocol Policy"
 $Header =  "UDLD Protocol Policy"

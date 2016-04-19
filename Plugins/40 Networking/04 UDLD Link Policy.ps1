@@ -14,7 +14,7 @@ $UdldLinkSettingsHashTable = @{
     Mode = $UdldMode
 }
 
-
+# FIX ME LIKE LACP AND PFC -- CHECK PROFILE / POLICY USAGE ON PORTS
 Foreach ($UdldLinkPolicy in $UdldLinkPolicies) {
     $Details = '' | Select Name, AdminState, Mode
     # Use keys in hash table to compare expected data to actual data
