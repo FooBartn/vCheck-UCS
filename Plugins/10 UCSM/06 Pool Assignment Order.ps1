@@ -1,5 +1,5 @@
 # Start of Settings
-# At what percent usage should pools be reported
+# Define the preferred pool assignment order (default/sequential):
 $AssignmentOrder = "sequential"
 # End of Settings
 
