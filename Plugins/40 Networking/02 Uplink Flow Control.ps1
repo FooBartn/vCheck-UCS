@@ -20,23 +20,27 @@ $script:PortFlowCtrlTable = @()
 function Get-PfcSetting {
     param (
         # Port or Port Channel Uplink Object
-        [Parameter(Mandatory = $True)]
+        [Parameter(Mandatory=$True)]
         [array]
         $UplinkObjects
     )
     
+
+    
     Foreach ($UplinkObject in $UplinkObjects) {
         $FlowCtrlPolicy = Get-UcsFlowctrlItem -Name $UplinkObject.FlowCtrlPolicy
         $Details = '' | Select SwitchId, Port, Name, Prio, Snd, Rcv
+        $ReportSetting = $false
         # Use keys in hash table to compare expected data to actual data
         Foreach ($Setting in $PfcPortSettingsHashTable.Keys) {
             # If the actual value is not equal to the expected value
             If ($FlowCtrlPolicy.$Setting -ne $PfcPortSettingsHashTable.$Setting) {
                 $Details.$Setting = $FlowCtrlPolicy.$Setting
+                $ReportSetting = $true
             }
         }
         # If detail object is not null, define port and add it to the array
-        If ($Details) {
+        If ($ReportSetting) {
             $Details.SwitchId = $UplinkObject.SwitchId
             $Details.Port = $UplinkObject.Rn
             $Details.Name = $FlowCtrlPolicy.Name

@@ -17,15 +17,17 @@ $UdldLinkSettingsHashTable = @{
 # FIX ME LIKE LACP AND PFC -- CHECK PROFILE / POLICY USAGE ON PORTS
 Foreach ($UdldLinkPolicy in $UdldLinkPolicies) {
     $Details = '' | Select Name, AdminState, Mode
+    $ReportSetting = $false
     # Use keys in hash table to compare expected data to actual data
     Foreach ($Setting in $UdldLinkSettingsHashTable.Keys) {
         # If the actual value is not equal to the expected value
         If ($UdldLinkPolicy.$Setting -ne $UdldLinkSettingsHashTable.$Setting) {
             $Details.$Setting = $UdldLinkPolicy.$Setting
+            $ReportSetting = $true
         }
     }
     # If detail object is not null, define port and add it to the array
-    If ($Details) {
+    If ($ReportSetting) {
         $Details.Name = $UdldLinkPolicy.Name
         $UdldLinkPolicyTable += $Details
     }

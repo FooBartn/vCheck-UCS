@@ -6,7 +6,6 @@ $LacpRate = 'normal'
 # End of Settings 
 
 $LacpPolicyTable = @()
-$ReportSetting = $false
 
 # Create Hash Table for Comparison
 $LacpSettingsHashTable = @{
@@ -18,6 +17,7 @@ $LacpSettingsHashTable = @{
 Foreach ($UplinkPortChannel in $UplinkPortChannels) {
     $LacpPolicy = Get-UcsFabricLacpPolicy -Name $UplinkPortChannel.LacpPolicyName -Dn $UplinkPortChannel.OperLacpPolicyName
     $Details = '' | Select SwitchId, PortChannel, Name, SuspendIndividual, FastTimer
+    $ReportSetting = $false
     # Use keys in hash table to compare expected data to actual data
     Foreach ($Setting in $LacpSettingsHashTable.Keys) {
         # If the actual value is not equal to the expected value

@@ -15,13 +15,13 @@ $NetCtrlPolicyHash = @{
 }
 
 $NetCtrlPolicyTable = @()
-$ReportSetting = $false
 
 Foreach ($SvcProfile in $SvcProfiles) {
     $Vnics = $SvcProfile | Get-UcsVnic
     Foreach ($Vnic in $Vnics) {
         $Details = '' | Select-Object Profile, vNIC, Policy, CDP, MacRegisterMode, UplinkFailAction
         $NetCtrlPolicy = Get-UcsNetworkControlPolicy -Dn $Vnic.OperNwCtrlPolicyName
+        $ReportSetting = $false
         Foreach ($Setting in $NetCtrlPolicyHash.Keys) {
             If ($NetCtrlPolicy.$Setting -ne $NetCtrlPolicyHash.$Setting) {
                 $Details.$Setting = $NetCtrlPolicy.$Setting
