@@ -56,13 +56,25 @@
 #>
 [CmdletBinding()]
 param (
-   [Switch]$config,
+   [switch]$config,
    [ValidateScript({Test-Path $_ -PathType 'Container'})]
    [string]$Outputpath,
    [ValidateScript({Test-Path $_ -PathType 'Leaf'})]
-   [string]$job
+   [string]$job,
+
+   [Parameter(Mandatory=$false,ParameterSetName = 'Import')]
+   [switch]$Import,
+
+   [Parameter(Mandatory=$false,ParameterSetName = 'Export')]
+   [switch]$Export,
+
+   [Parameter(Mandatory=$true,ParameterSetName = 'Import')]
+   [Parameter(ParameterSetName = 'Export')]
+   [ValidateNotNullOrEmpty()]
+   [string]$SettingsFilePath
+
 )
-$vCheckVersion = "6.23-alpha-3"
+$vCheckVersion = '6.23-alpha-3'
 $Date = Get-Date
 
 ################################################################################
@@ -102,21 +114,21 @@ $lang = DATA {
 '@
 }
 
-Import-LocalizedData -BaseDirectory ($ScriptPath + "\lang") -BindingVariable lang -ErrorAction SilentlyContinue
+Import-LocalizedData -BaseDirectory ($ScriptPath + '\lang') -BindingVariable lang -ErrorAction SilentlyContinue
 
 ################################################################################
 #                                  Functions                                   #
 ################################################################################
 <# Write timestamped output to screen #>
 function Write-CustomOut ($Details){
-   $LogDate = Get-Date -Format "HH:mm:ss"
+   $LogDate = Get-Date -Format 'HH:mm:ss'
    Write-Host "[$($LogDate)] $Details"
 }
 
 <# Search $file_content for name/value pair with ID_Name and return value #>
 Function Get-ID-String ($file_content,$ID_name) {
    if ($file_content | Select-String -Pattern "\$+$ID_name\s*=") {
-      $value = (($file_content | Select-String -pattern "\$+${ID_name}\s*=").toString().split("=")[1]).Trim(' "')
+      $value = (($file_content | Select-String -pattern "\$+${ID_name}\s*=").toString().split('=')[1]).Trim(' "')
       return ( $value )
    }
 }
@@ -125,32 +137,32 @@ Function Get-ID-String ($file_content,$ID_name) {
 Function Get-PluginID ($Filename){
    # Get the identifying information for a plugin script
    $file = Get-Content $Filename
-   $Title = Get-ID-String $file "Title"
+   $Title = Get-ID-String $file 'Title'
    if ( !$Title ) { $Title = $Filename }
-   $PluginVersion = Get-ID-String $file "PluginVersion"
-   $Author = Get-ID-String $file "Author"
-   $Ver = "{0:N1}" -f $PluginVersion
+   $PluginVersion = Get-ID-String $file 'PluginVersion'
+   $Author = Get-ID-String $file 'Author'
+   $Ver = '{0:N1}' -f $PluginVersion
 
-   return @{"Title"=$Title; "Version"=$Ver; "Author"=$Author }
+   return @{'Title'=$Title; 'Version'=$Ver; 'Author'=$Author }
 }
 
 <# Run through settings for specified file, expects question on one line, and variable/value on following line #>
 Function Invoke-Settings ($Filename, $GB) {
    $file = Get-Content $filename
-   $OriginalLine = ($file | Select-String -Pattern "# Start of Settings").LineNumber
-   $EndLine = ($file | Select-String -Pattern "# End of Settings").LineNumber
+   $OriginalLine = ($file | Select-String -Pattern '# Start of Settings').LineNumber
+   $EndLine = ($file | Select-String -Pattern '# End of Settings').LineNumber
    if (!(($OriginalLine +1) -eq $EndLine)) {
       $Array = @()
       $Line = $OriginalLine
       $PluginName = (Get-PluginID $Filename).Title
-      If ($PluginName.EndsWith(".ps1",1)) {
-         $PluginName = ($PluginName.split("\")[-1]).split(".")[0]
+      If ($PluginName.EndsWith('.ps1',1)) {
+         $PluginName = ($PluginName.split('\')[-1]).split('.')[0]
       }
       Write-Host "`n$PluginName" -foreground $host.PrivateData.WarningForegroundColor -background $host.PrivateData.WarningBackgroundColor
       do {
          $Question = $file[$Line]
          $Line ++
-         $Split= ($file[$Line]).Split("=")
+         $Split= ($file[$Line]).Split('=')
          $Var = $Split[0]
          $CurSet = $Split[1].Trim()
          
@@ -173,7 +185,7 @@ Function Invoke-Settings ($Filename, $GB) {
          }
          $Line ++ 
       } Until ( $Line -ge ($EndLine -1) )
-      $Array += "# End of Settings"
+      $Array += '# End of Settings'
 
       $out = @()
       $out = $File[0..($OriginalLine -1)]
@@ -188,8 +200,8 @@ Function Invoke-Settings ($Filename, $GB) {
 function Format-HTMLEntities {
    param ([string]$content)
 
-   $replace = @{"&lt;" = "<";
-                "&gt;" = ">"; }
+   $replace = @{'&lt;' = '<';
+                '&gt;' = '>'; }
    
    foreach ($r in $replace.Keys.GetEnumerator()) {
       $content = $content -replace $r, $replace[$r]
@@ -204,7 +216,7 @@ Function Get-HTMLTable {
    # Use an XML object for ease of use
    $XMLTable = [xml]($content | ConvertTo-Html -Fragment)
    $XMLTable.table.RemoveChild($XMLTable.table.colgroup) | out-null
-   $XMLTable.table.SetAttribute("width","100%")
+   $XMLTable.table.SetAttribute('width','100%')
 
    # If format rules are specified
    if ($FormatRules) {
@@ -218,27 +230,27 @@ Function Get-HTMLTable {
                   if ($value -notmatch "^[0-9.]+$") {
                      $value = """$value"""
                   }
-                  if ( Invoke-Expression ("{0} {1}" -f $value, [string]$rule.Keys) ) {
+                  if ( Invoke-Expression ('{0} {1}' -f $value, [string]$rule.Keys) ) {
                      # Find what to 
-                     $RuleScope = ([string]$rule.Values).split(",")[0]
-                     $RuleActions = ([string]$rule.Values).split(",")[1].split("|")
+                     $RuleScope = ([string]$rule.Values).split(',')[0]
+                     $RuleActions = ([string]$rule.Values).split(',')[1].split('|')
 
                      switch ($RuleScope) {
-                        "Row"  { 
+                        'Row'  { 
                            for ($TRColN = 0; $TRColN -lt $XMLTable.table.tr[$RowN].td.count; $TRColN++) {
                               $XMLTable.table.tr[$RowN].selectSingleNode("td[$($TRColN+1)]").SetAttribute($RuleActions[0], $RuleActions[1]) 
                            }
                         }
-                        "Cell" {
-                           if ($RuleActions[0] -eq "cid") {
+                        'Cell' {
+                           if ($RuleActions[0] -eq 'cid') {
                               # Do Image - create new XML node for img and clear #text
-                              $XMLTable.table.tr[$RowN].selectSingleNode("td[$($ColN+1)]")."#text" = ""
-                              $elem = $XMLTable.CreateElement("img")
-                              $elem.SetAttribute("src", ("cid:{0}" -f $RuleActions[1]))
+                              $XMLTable.table.tr[$RowN].selectSingleNode("td[$($ColN+1)]").'#text' = ''
+                              $elem = $XMLTable.CreateElement('img')
+                              $elem.SetAttribute('src', ('cid:{0}' -f $RuleActions[1]))
                               # Add img size if specified
-                              if ($RuleActions[2] -match "(\d+)x(\d+)") {
-                                 $elem.SetAttribute("width", $Matches[1])
-                                 $elem.SetAttribute("height", $Matches[2])
+                              if ($RuleActions[2] -match '(\d+)x(\d+)') {
+                                 $elem.SetAttribute('width', $Matches[1])
+                                 $elem.SetAttribute('height', $Matches[2])
                               }
 
                               $XMLTable.table.tr[$RowN].selectSingleNode("td[$($ColN+1)]").AppendChild($elem) | Out-Null
@@ -269,7 +281,7 @@ Function Get-HTMLList {
          [xml]$XMLTable = $content | ConvertTo-HTML -Fragment
          $XMLTable.table.RemoveChild($XMLTable.table.colgroup) | out-null
          $XMLTable.table.RemoveChild($XMLTable.table.tr[0]) | out-null
-         $XMLTable.table.SetAttribute("width","100%")
+         $XMLTable.table.SetAttribute('width','100%')
       }
       else {
          [xml]$XMLTable = $content | ConvertTo-HTML -Fragment -As List
@@ -278,8 +290,8 @@ Function Get-HTMLList {
       # Replace the first column td with th
       for ($i = 0; $i -lt $XMLTable.table.tr.count; $i++) {
          $node = $XMLTable.table.tr[$i].SelectSingleNode("/table/tr[$($i+1)]/td[1]")
-         $elem = $XMLTable.CreateElement("th")
-         $elem.InnerText = $node."#text"
+         $elem = $XMLTable.CreateElement('th')
+         $elem.InnerText = $node.'#text'
          $trNode = $XMLTable.SelectSingleNode("/table/tr[$($i+1)]")
          $trNode.ReplaceChild($elem, $node) | Out-Null
       }
@@ -293,13 +305,13 @@ function Get-HTMLChart {
       [string]$cidbase,
       [Object[]]$ChartObjs
    )
-   $html = ""
+   $html = ''
    $i = 0
    foreach ($ChartObj in $ChartObjs) {
       $i++
       $base64 = Get-ChartResource $ChartObj
-      $cid = $cidbase+"-"+$i
-      Add-ReportResource -cid $cid -ResourceData $Base64 -Type "Base64" -Used $true
+      $cid = $cidbase+'-'+$i
+      Add-ReportResource -cid $cid -ResourceData $Base64 -Type 'Base64' -Used $true
       $html += "<img src='cid:$cid' />"
    }
    return $html
@@ -316,17 +328,17 @@ function New-Chart {
       [string]$title,
       [string]$titleX,
       [string]$titleY,
-      [ValidateSet("Area", "Bar", "BoxPlot", "Bubble", "Candlestick", "Column", "Doughnut", "ErrorBar", "FastLine", 
-                   "FastPoint", "Funnel", "Kagi", "Line", "Pie", "Point", "PointAndFigure", "Polar", "Pyramid", 
-                   "Radar", "Range", "RangeBar", "RangeColumn", "Renko", "Spline", "SplineArea", "SplineRange", 
-                   "StackedArea", "StackedArea100", "StackedBar", "StackedBar100", "StackedColumn", 
-                   "StackedColumn100", "StepLine", "Stock", "ThreeLineBreak")]
-      $ChartType="bar"
+      [ValidateSet('Area', 'Bar', 'BoxPlot', 'Bubble', 'Candlestick', 'Column', 'Doughnut', 'ErrorBar', 'FastLine', 
+                   'FastPoint', 'Funnel', 'Kagi', 'Line', 'Pie', 'Point', 'PointAndFigure', 'Polar', 'Pyramid', 
+                   'Radar', 'Range', 'RangeBar', 'RangeColumn', 'Renko', 'Spline', 'SplineArea', 'SplineRange', 
+                   'StackedArea', 'StackedArea100', 'StackedBar', 'StackedBar100', 'StackedColumn', 
+                   'StackedColumn100', 'StepLine', 'Stock', 'ThreeLineBreak')]
+      $ChartType='bar'
    )
 
    # If chartsize is specified in style, use it unless explicitly set
    if ($ChartSize -and (-not $height -and -not $width)) {
-      if ($ChartSize -match "(\d+)x(\d+)") {
+      if ($ChartSize -match '(\d+)x(\d+)') {
          $height = $Matches[1]
          $width = $Matches[2]
       }
@@ -337,13 +349,13 @@ function New-Chart {
       $width = 400
    }
 
-   return New-Object PSObject -Property @{"height" = $height;
-                                          "width"  = $width; 
-                                          "data"   = $data;
-                                          "title"  = $title;
-                                          "titleX" = $titleX;
-                                          "titleY" = $titleY;
-                                          "ChartType" = $ChartType
+   return New-Object PSObject -Property @{'height' = $height;
+                                          'width'  = $width; 
+                                          'data'   = $data;
+                                          'title'  = $title;
+                                          'titleX' = $titleX;
+                                          'titleY' = $titleY;
+                                          'ChartType' = $ChartType
                                  }
 }
 
@@ -352,13 +364,13 @@ function Get-ChartResource {
    param (
       $ChartDef
    )
-   [void][Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms.DataVisualization")
+   [void][Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms.DataVisualization')
 
    # Create a new chart object
    $Chart = New-object System.Windows.Forms.DataVisualization.Charting.Chart 
    $Chart.Width = $ChartDef.width 
    $Chart.Height = $ChartDef.height 
-   $Chart.AntiAliasing  = "All"
+   $Chart.AntiAliasing  = 'All'
 
    # Create a chartarea to draw on and add to chart 
    $ChartArea = New-Object System.Windows.Forms.DataVisualization.Charting.ChartArea 
@@ -402,7 +414,7 @@ function Get-ChartResource {
    }
 
    # Do some funky work to increase the DPI so charts look nice. Default 96 DPI looks terrible :(
-   [void][System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
+   [void][System.Reflection.Assembly]::LoadWithPartialName('System.Drawing')
 
    $bmp = New-Object System.Drawing.Bitmap(($ChartDef.width), ($ChartDef.height))
    $bmp.SetResolution(384, 384);
@@ -416,7 +428,7 @@ function Get-ChartResource {
    $byte = New-Object byte[] $ms.Length
    $ms.read($byte, 0, $ms.length) | Out-Null
 
-   return ("png|{0}" -f [System.Convert]::ToBase64String($byte))
+   return ('png|{0}' -f [System.Convert]::ToBase64String($byte))
 }
 
 <# Takes Array of HTML colour codes and returns Color object #>
@@ -440,15 +452,15 @@ function Add-ReportResource {
    param (
       $cid,
       $ResourceData,
-      [ValidateSet("File","SystemIcons","Base64")]
-      $Type="File",
+      [ValidateSet('File','SystemIcons','Base64')]
+      $Type='File',
       $Used=$false
    )
 
    # If cid does not exist, add it
    if ($global:ReportResources.Keys -notcontains $cid) {
-      $global:ReportResources.Add($cid, @{"Data" = ("{0}|{1}" -f $Type, $ResourceData);
-                                          "Uses" = 0 })
+      $global:ReportResources.Add($cid, @{'Data' = ('{0}|{1}' -f $Type, $ResourceData);
+                                          'Uses' = 0 })
    }
 
    # Update uses count if $Used set (Should normally be incremented with Set-ReportResource)
@@ -472,24 +484,24 @@ base64 encoded string, and Linked Resource for email #>
 function Get-ReportResource {
    param (
       $cid,
-      [ValidateSet("embed","linkedresource")]
-      $ReturnType="embed"
+      [ValidateSet('embed','linkedresource')]
+      $ReturnType='embed'
    )
 
-   $data = $global:ReportResources[$cid].Data.Split("|")
+   $data = $global:ReportResources[$cid].Data.Split('|')
 
    # Process each resource type differently
    switch ($data[0]) {
-      "File"   {
+      'File'   {
          # Check the path exists
          if (Test-Path $data[1] -ErrorAction SilentlyContinue) {
-            if ($ReturnType -eq "embed") {
+            if ($ReturnType -eq 'embed') {
                # return a MIME/Base64 combo for embedding in HTML
                $imgData = Get-Content ($data[1]) -Encoding Byte
-               $type = $data[1].substring($data[1].LastIndexOf(".")+1)
-               return ("data:image/{0};base64,{1}" -f $type, [System.Convert]::ToBase64String($imgData))
+               $type = $data[1].substring($data[1].LastIndexOf('.')+1)
+               return ('data:image/{0};base64,{1}' -f $type, [System.Convert]::ToBase64String($imgData))
             }
-            if ($ReturnType -eq "linkedresource") {
+            if ($ReturnType -eq 'linkedresource') {
                # return a linked resource to be added to mail message
                $lr = New-Object system.net.mail.LinkedResource($data[1])
                $lr.ContentId=$cid
@@ -500,34 +512,34 @@ function Get-ReportResource {
             Write-Warning ($lang.resFileWarn -f $cid)
          }
       }
-      "SystemIcons" {
+      'SystemIcons' {
          # Take the SystemIcon Name - see http://msdn.microsoft.com/en-us/library/system.drawing.systemicons(v=vs.110).aspx
          # Load the image into a MemoryStream in PNG format (to preserve transparency)
-         [void] [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
+         [void] [System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms')
          $bmp = ([System.Drawing.SystemIcons]::($data[1])).toBitmap()
          $bmp.MakeTransparent()
          $ms = new-Object IO.MemoryStream
          $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::PNG)
          $ms.Seek(0, [System.IO.SeekOrigin]::Begin) | Out-Null
 
-         if ($ReturnType -eq "embed") {
+         if ($ReturnType -eq 'embed') {
             # return a MIME/Base64 combo for embedding in HTML
             $byte = New-Object byte[] $ms.Length
             $ms.read($byte, 0, $ms.length) | Out-Null
-            return ("data:image/png;base64,"+[System.Convert]::ToBase64String($byte))
+            return ('data:image/png;base64,'+[System.Convert]::ToBase64String($byte))
          }
-         if ($ReturnType -eq "linkedresource") {
+         if ($ReturnType -eq 'linkedresource') {
             # return a linked resource to be added to mail message
             $lr = New-Object system.net.mail.LinkedResource($ms)
             $lr.ContentId=$cid
             return $lr;
          }
       }
-      "Base64" {
-         if ($ReturnType -eq "embed") {
-            return ("data:image/{0};base64,{1}" -f $data[1], $data[2])
+      'Base64' {
+         if ($ReturnType -eq 'embed') {
+            return ('data:image/{0};base64,{1}' -f $data[1], $data[2])
          }
-         if ($ReturnType -eq "linkedresource") {
+         if ($ReturnType -eq 'linkedresource') {
             $w = [system.convert]::FromBase64String($data[2])
             $ms = new-Object IO.MemoryStream
             $ms.Write($w, 0 , $w.Length);
@@ -540,287 +552,424 @@ function Get-ReportResource {
    }
 }
 
+Function Export-vCheckSettings {
+   param
+   (
+       [string]
+       [Parameter(Mandatory = $true)]
+       $Filename
+   )
+
+   $file = Get-Content $Filename
+   $OriginalLine = ($file | Select-String -Pattern '# Start of Settings').LineNumber
+   $EndLine = ($file | Select-String -Pattern '# End of Settings').LineNumber
+   if (!(($OriginalLine +1) -eq $EndLine)) {
+       $SettingArray = @() 
+       $Line = $OriginalLine
+       $PluginDetails = Get-PluginID -Filename $FileName
+       $PluginName = $PluginDetails.Title
+       If ($PluginDetails.Title.EndsWith('.ps1',1)) {$PluginName = ($PluginDetails.Title.split('\')[-1]).split('.')[0]}
+
+       do {
+           $SettingDetails = '' | Select-Object -Property Name, Question, Answer, Version, FileName
+                
+           # Get question / answer from plugin
+           $Question = $file[$Line]
+           $Line ++
+           $Answer = $file[$Line]
+         
+           # Add details to object
+           $SettingDetails.Name = $PluginName
+           $SettingDetails.Question = $Question
+           $SettingDetails.Answer = $Answer
+           $SettingDetails.Version = $PluginDetails.Version
+           $SettingDetails.FileName = $Filename
+
+           # Add object to array
+           $SettingArray += $SettingDetails
+
+           # Next Question
+           $Line ++ 
+       } Until ( $Line -ge ($EndLine -1) )
+
+       Return $SettingArray
+   }
+}
+
+Function Import-vCheckSettings {
+   param
+   (
+       [String]
+       [Parameter(Mandatory=$true)]
+       $ImportFile
+   )
+        
+   $ImportedSettings = Import-Csv $ImportFile
+   $AllSettingFiles = $vCheckPlugins + (Get-Item $GlobalVariables)
+   $SettingReport = @()
+
+
+   Foreach ($SettingFile in $AllSettingFiles) {
+       $file = Get-Content $SettingFile.FullName
+       $NewFile = $file
+       $OriginalLine = ($file | Select-String -Pattern '# Start of Settings').LineNumber
+       $EndLine = ($file | Select-String -Pattern '# End of Settings').LineNumber
+       if (!(($OriginalLine +1) -eq $EndLine)) {
+           $PluginDetails = Get-PluginID -Filename $SettingFile.FullName
+           $PluginName = $PluginDetails.Title
+
+           If ($PluginDetails.Title.EndsWith('.ps1',1)) {$PluginName = ($PluginDetails.Title.split('\')[-1]).split('.')[0]}
+ 
+           If ($ImportedSettings.Name -contains $PluginName){
+               $PluginSettings = $ImportedSettings | Where-Object {$_.Name -eq $PluginName}
+               Foreach ($PluginSetting in $PluginSettings){
+                   $SettingDetails = '' | Select-Object -Property Name, Question, Imported, Value, NewVersion, NewPlugin, Comment
+                   $SettingDetails.Name = $PluginName
+                   $SettingDetails.Question = $PluginSetting.Question
+                   $Question = [Regex]::Escape($PluginSetting.Question)
+                   $QuestionLine = ($file | Select-String -Pattern $Question).LineNumber
+                   if ($QuestionLine) {
+                       $AnswerLine = $QuestionLine++
+                       If ($file[$AnswerLine] -ne $PluginSetting.Answer) {
+                           $NewFile[$AnswerLine] = $PluginSetting.Answer
+                           $SettingDetails.Imported = $true
+                           $SettingDetails.Value = $PluginSetting.Answer
+                       } else {
+                           $SettingDetails.Imported = $false
+                           $SettingDetails.Comment = 'No update necessary.'
+                       }
+
+                       If ($PluginSetting.Version -lt $PluginDetails.Version) {
+                           $SettingDetails.NewVersion = $true
+                           $SettingDetails.Comment = 'Updated Plugin: Check for new parameters'
+                       }
+
+                       $SettingReport += $SettingDetails
+                   } else {
+                      $SettingDetails.Imported = $false
+                      $SettingDetails.Comment = 'Setting not found'
+                   }
+               }
+
+               If ($file -ne $NewFile) {
+                   $NewFile | Out-File $SettingFile.FullName -Force
+               }
+           } Else {
+               $SettingDetails = '' | Select-Object -Property Name, Imported, Value, NewVersion, NewPlugin, Comment
+               $SettingDetails.Name = $PluginName
+               $SettingDetails.NewPlugin = $true
+               $SettingDetails.Comment = 'New Plugin: Update parameters manually'
+               $SettingReport += $SettingDetails
+           }
+       }
+   }
+
+   $SettingReport
+}
+
 ################################################################################
 #                                Initialization                                #
 ################################################################################
 # Setup all paths required for script to run
 $ScriptPath = (Split-Path ((Get-Variable MyInvocation).Value).MyCommand.Path)
-$PluginsFolder = $ScriptPath + "\Plugins\"
+$PluginsFolder = $ScriptPath + '\Plugins\'
 
-# if we have the job parameter set, get the paths from the config file.
-if ($job) {
-   [xml]$jobConfig = Get-Content $job
+if ($Export) {
+   $ExportedSettings = @()
 
-   # Use GlobalVariables path if it is valid, otherwise use default
-   if (Test-Path $jobConfig.vCheck.globalVariables) {
-      $GlobalVariables = (Get-Item $jobConfig.vCheck.globalVariables).FullName
-   }
-   else {
-      $GlobalVariables = $ScriptPath + "\GlobalVariables.ps1"
-      Write-Warning ($lang.gvInvalid -f $GlobalVariables)
-   }
-
-   # Get Plugin paths
-   $PluginPaths = @()
-   if ($jobConfig.vCheck.plugins.path) {
-      foreach ($PluginPath in ($jobConfig.vCheck.plugins.path -split ";")) {
-         if (Test-Path $PluginPath) {
-            $PluginPaths += (Get-Item $PluginPath).Fullname
-            $PluginPaths += Get-Childitem $PluginPath -Recurse | ?{ $_.PSIsContainer } | Select -ExpandProperty FullName
-         }
-         else {
-            $PluginPaths += $ScriptPath + "\Plugins"
-            Write-Warning ($lang.pluginpathInvalid -f $PluginPath, ($ScriptPath + "\Plugins"))
-         }
-      }
-      $PluginPaths = $PluginPaths | Sort-Object -unique
-
-      # Get all plugins and test they are correct
-      $vCheckPlugins = @()
-      foreach ($plugin in $jobConfig.vCheck.plugins.plugin) {
-         $testedPaths = 0
-         foreach ($PluginPath in $PluginPaths) {
-            $testedPaths++
-            if (Test-Path ("{0}\{1}" -f $PluginPath, $plugin)) {
-               $vCheckPlugins += Get-Item ("{0}\{1}" -f $PluginPath, $plugin)
-               break;
-            }
-            # Plugin not found in any search path
-            elseif ($testedPaths -eq $PluginPaths.Count) {
-               Write-Warning ($lang.pluginInvalid -f $plugin)
-            }
-         }
-      }
-   }
-   # if no valid plugins specified, fall back to default
-   if (!$vCheckPlugins) {
-      $vCheckPlugins = Get-ChildItem -Path $PluginsFolder -filter "*.ps1" -Recurse | Sort FullName
-   }
-}
-else {
-   $ToNatural = { [regex]::Replace($_, '\d+', { $args[0].Value.PadLeft(20) }) }
-   $vCheckPlugins = @(Get-ChildItem -Path $PluginsFolder -filter "*.ps1" -Recurse | where {$_.Directory -match "initialize"} | Sort $ToNatural)
-   $PluginsSubFolder = Get-ChildItem -Path $PluginsFolder | where {($_.PSIsContainer) -and ($_.Name -notmatch "initialize") -and ($_.Name -notmatch "finish")}
-   $vCheckPlugins += $PluginsSubFolder | % {Get-ChildItem -Path $_.FullName -filter "*.ps1" | Sort $ToNatural}
-   $vCheckPlugins += Get-ChildItem -Path $PluginsFolder -filter "*.ps1" -Recurse | where {$_.Directory -match "finish"} | Sort $ToNatural
-   $GlobalVariables = $ScriptPath + "\GlobalVariables.ps1"
-}
-
-## Determine if the setup wizard needs to run
-$file = Get-Content $GlobalVariables
-$Setup = ($file | Select-String -Pattern '# Set the following to true to enable the setup wizard for first time run').LineNumber
-$SetupLine = $Setup ++
-$SetupSetting = Invoke-Expression (($file[$SetupLine]).Split("="))[1]
-
-if ($SetupSetting -or $config) {
-   Clear-Host 
-   ($lang.GetEnumerator() | where {$_.Name -match "setupMsg[0-9]*"} | Sort-Object Name) | Foreach {
-      Write-Host -foreground $host.PrivateData.WarningForegroundColor -background $host.PrivateData.WarningBackgroundColor $_.value
+   if (!(Test-Path $SettingsFilePath -ErrorAction SilentlyContinue)) {
+      $ForceCreate = Read-Host "$SettingsFilePath does not currently exist. Create it? (y/n)"
+      if ($ForceCreate -eq 'y'){
+        $null = New-Item -Path $SettingsFilePath -ItemType File -Force
+      } else {
+         Throw "Unable to export settings. File does not exist."
+      } 
    }
 
-   Invoke-Settings -Filename $GlobalVariables -GB $true
-   Foreach ($plugin in $vCheckPlugins) { 
-      Invoke-Settings -Filename $plugin.Fullname
-   }
-}
+   $ExportedSettings += Export-vCheckSettings -Filename $GlobalVariables
+   Foreach ($plugin in $vCheckPlugins) {$ExportedSettings += Export-vCheckSettings -Filename $plugin.Fullname}
 
-## Include GlobalVariables and validate settings (at the moment just check they exist)
-. $GlobalVariables
+   $ExportedSettings | Export-Csv -Path $SettingsFilePath -NoTypeInformation
 
-$vcvars = @("SetupWizard" , "reportHeader" , "SMTPSRV" , "EmailFrom" , "EmailTo" , "EmailSubject", "DisplaytoScreen" , "SendEmail" , "SendAttachment", "TimeToRun" , "PluginSeconds" , "Style" , "Date")
-foreach($vcvar in $vcvars) {
-   if (!($(Get-Variable -Name "$vcvar" -Erroraction 'SilentlyContinue'))) {
-      Write-Error ($lang.varUndefined -f $vcvar)
-   } 
-}
+   Write-CustomOut "Export Complete: $SettingsFilePath"
+} elseif ($Import) {
+   Import-vCheckSettings -ImportFile $SettingsFilePath | Out-GridView
+} else {
+    # if we have the job parameter set, get the paths from the config file.
+    if ($job) {
+       [xml]$jobConfig = Get-Content $job
 
-# Create empty array of resources (i.e. Images)
-$global:ReportResources = @{}
+       # Use GlobalVariables path if it is valid, otherwise use default
+       if (Test-Path $jobConfig.vCheck.globalVariables) {
+          $GlobalVariables = (Get-Item $jobConfig.vCheck.globalVariables).FullName
+       }
+       else {
+          $GlobalVariables = $ScriptPath + '\GlobalVariables.ps1'
+          Write-Warning ($lang.gvInvalid -f $GlobalVariables)
+       }
 
-## Set the StylePath and include it
-$StylePath = $ScriptPath + "\Styles\" + $Style
-if(!(Test-Path ($StylePath))) {
-   # The path is not valid
-   # Use the default style
-   Write-Warning "Style path ($($StylePath)) is not valid"
-   $StylePath = $ScriptPath + "\Styles\VMware"
-   Write-Warning "Using $($StylePath)"
-}
+       # Get Plugin paths
+       $PluginPaths = @()
+       if ($jobConfig.vCheck.plugins.path) {
+          foreach ($PluginPath in ($jobConfig.vCheck.plugins.path -split ';')) {
+             if (Test-Path $PluginPath) {
+                $PluginPaths += (Get-Item $PluginPath).Fullname
+                $PluginPaths += Get-Childitem $PluginPath -Recurse | ?{ $_.PSIsContainer } | Select -ExpandProperty FullName
+             }
+             else {
+                $PluginPaths += $ScriptPath + '\Plugins'
+                Write-Warning ($lang.pluginpathInvalid -f $PluginPath, ($ScriptPath + '\Plugins'))
+             }
+          }
+          $PluginPaths = $PluginPaths | Sort-Object -unique
 
-# Import the Style
-. ("$($StylePath)\Style.ps1")
+          # Get all plugins and test they are correct
+          $vCheckPlugins = @()
+          foreach ($plugin in $jobConfig.vCheck.plugins.plugin) {
+             $testedPaths = 0
+             foreach ($PluginPath in $PluginPaths) {
+                $testedPaths++
+                if (Test-Path ('{0}\{1}' -f $PluginPath, $plugin)) {
+                   $vCheckPlugins += Get-Item ('{0}\{1}' -f $PluginPath, $plugin)
+                   break;
+                }
+                # Plugin not found in any search path
+                elseif ($testedPaths -eq $PluginPaths.Count) {
+                   Write-Warning ($lang.pluginInvalid -f $plugin)
+                }
+             }
+          }
+       }
+       # if no valid plugins specified, fall back to default
+       if (!$vCheckPlugins) {
+          $vCheckPlugins = Get-ChildItem -Path $PluginsFolder -filter '*.ps1' -Recurse | Sort FullName
+       }
+    }
+    else {
+       $ToNatural = { [regex]::Replace($_, '\d+', { $args[0].Value.PadLeft(20) }) }
+       $vCheckPlugins = @(Get-ChildItem -Path $PluginsFolder -filter '*.ps1' -Recurse | where {$_.Directory -match 'initialize'} | Sort $ToNatural)
+       $PluginsSubFolder = Get-ChildItem -Path $PluginsFolder | where {($_.PSIsContainer) -and ($_.Name -notmatch 'initialize') -and ($_.Name -notmatch 'finish')}
+       $vCheckPlugins += $PluginsSubFolder | % {Get-ChildItem -Path $_.FullName -filter '*.ps1' | Sort $ToNatural}
+       $vCheckPlugins += Get-ChildItem -Path $PluginsFolder -filter '*.ps1' -Recurse | where {$_.Directory -match 'finish'} | Sort $ToNatural
+       $GlobalVariables = $ScriptPath + '\GlobalVariables.ps1'
+    }
 
-################################################################################
-#                                 Script logic                                 #
-################################################################################
-# Start generating the report
-$PluginResult = @()
+    ## Determine if the setup wizard needs to run
+    $file = Get-Content $GlobalVariables
+    $Setup = ($file | Select-String -Pattern '# Set the following to true to enable the setup wizard for first time run').LineNumber
+    $SetupLine = $Setup ++
+    $SetupSetting = Invoke-Expression (($file[$SetupLine]).Split('='))[1]
 
-Write-Host $lang.pluginBegin -foreground $host.PrivateData.WarningForegroundColor -background $host.PrivateData.WarningBackgroundColor
-# Loop over all enabled plugins
-$p = 0 
-$vCheckPlugins | Foreach {
-   $TableFormat = $null
-   $PluginInfo = Get-PluginID $_.Fullname
-   $p++
-   Write-CustomOut ($lang.pluginStart -f $PluginInfo["Title"], $PluginInfo["Author"], $PluginInfo["Version"], $p, $vCheckPlugins.count)
-   $pluginStatus = ($lang.pluginStatus -f $p, $vCheckPlugins.count, $_.Name)
-   Write-Progress -ID 1 -Activity $lang.pluginActivity -Status $pluginStatus -PercentComplete (100*$p/($vCheckPlugins.count))
-   $TTR = [math]::round((Measure-Command {$Details = . $_.FullName}).TotalSeconds, 2)
+    if ($SetupSetting -or $config) {
+       Clear-Host 
+       ($lang.GetEnumerator() | where {$_.Name -match 'setupMsg[0-9]*'} | Sort-Object Name) | Foreach {
+          Write-Host -foreground $host.PrivateData.WarningForegroundColor -background $host.PrivateData.WarningBackgroundColor $_.value
+       }
 
-   Write-CustomOut ($lang.pluginEnd -f $PluginInfo["Title"], $PluginInfo["Author"], $PluginInfo["Version"], $p, $vCheckPlugins.count)
-   # Do a replacement for {count} for number of items returned in $header
-   $Header = $Header -replace "\[count\]", $Details.count
+       Invoke-Settings -Filename $GlobalVariables -GB $true
+       Foreach ($plugin in $vCheckPlugins) { 
+          Invoke-Settings -Filename $plugin.Fullname
+       }
+    }
 
-   $PluginResult += New-Object PSObject -Property @{"Title" = $Title;
-                                                    "Author" = $PluginInfo["Author"];
-                                                    "Version" = $PluginInfo["Version"];
-                                                    "Details" = $Details;
-                                                    "Display" = $Display;
-                                                    "TableFormat" = $TableFormat;
-                                                    "Header" = $Header;
-                                                    "Comments" = $Comments;
-                                                    "TimeToRun" = $TTR; }
-}
-Write-Progress -ID 1 -Activity $lang.pluginActivity -Status $lang.Complete -Completed
+    ## Include GlobalVariables and validate settings (at the moment just check they exist)
+    . $GlobalVariables
 
-# Add report on plugins
-if ($reportOnPlugins) {
-   $Comments = "Plugins in numerical order"
-   $Plugins = @()
-   foreach ($Plugin in (Get-ChildItem $PluginsFolder -Include *.ps1, *.ps1.disabled -Recurse)) { 
-      $Plugins += New-Object PSObject -Property @{"Name" = (Get-PluginID  $Plugin.FullName).Title;
-                                                  "Enabled" = (($vCheckPlugins | Select -ExpandProperty FullName) -Contains $plugin.FullName) }
-   }
+    $vcvars = @('SetupWizard' , 'reportHeader' , 'SMTPSRV' , 'EmailFrom' , 'EmailTo' , 'EmailSubject', 'DisplaytoScreen' , 'SendEmail' , 'SendAttachment', 'TimeToRun' , 'PluginSeconds' , 'Style' , 'Date')
+    foreach($vcvar in $vcvars) {
+       if (!($(Get-Variable -Name "$vcvar" -Erroraction 'SilentlyContinue'))) {
+          Write-Error ($lang.varUndefined -f $vcvar)
+       } 
+    }
 
-   if ($ListEnabledPluginsFirst) {
-      $Plugins = $Plugins | Sort -property @{Expression="Enabled";Descending=$true}
-      $Comments = "Plugins in numerical order, enabled plugins listed first"
-   }
+    # Create empty array of resources (i.e. Images)
+    $global:ReportResources = @{}
 
-   $PluginResult += New-Object PSObject -Property @{"Title" = $lang.repPRTitle;
-                                                    "Author" = "vCheck";
-                                                    "Version" = $vCheckVersion;
-                                                    "Details" = $Plugins;
-                                                    "Display" = "Table";
-                                                    "TableFormat" = $null;
-                                                    "Header" = $lang.repPRTitle;
-                                                    "Comments" = $Comments;
-                                                    "TimeToRun" = 0; 
-                                                }
-}
+    ## Set the StylePath and include it
+    $StylePath = $ScriptPath + '\Styles\' + $Style
+    if(!(Test-Path ($StylePath))) {
+       # The path is not valid
+       # Use the default style
+       Write-Warning "Style path ($($StylePath)) is not valid"
+       $StylePath = $ScriptPath + '\Styles\VMware'
+       Write-Warning "Using $($StylePath)"
+    }
 
-# Add Time to Run detail for plugins - if specified in GlobalVariables.ps1
-if ($TimeToRun) {
-   $Finished = Get-Date
-   $PluginResult += New-Object PSObject -Property @{"Title" = $lang.repTTRTitle;
-                                                    "Author" = "vCheck";
-                                                    "Version" = $vCheckVersion;
-                                                    "Details" = ($PluginResult | Where { $_.TimeToRun -gt $PluginSeconds } | Select Title, TimeToRun | Sort-Object TimeToRun -Descending);
-                                                    "Display" = "List";
-                                                    "TableFormat" = $null;
-                                                    "Header" = ($lang.repTime -f [math]::round(($Finished - $Date).TotalMinutes,2), ($Finished.ToLongDateString()), ($Finished.ToLongTimeString()));
-                                                    "Comments" = ($lang.slowPlugins -f $PluginSeconds);
-                                                    "TimeToRun" = 0; 
-                                                   }
-}
+    # Import the Style
+    . ("$($StylePath)\Style.ps1")
 
-################################################################################
-#                                    Output                                    #
-################################################################################
-# Loop over plugin results and generate HTML from style
-$emptyReport = $true
-$p=1
-Foreach ( $pr in $PluginResult) {
-   If ($pr.Details) {
-      $emptyReport = $false
-      switch ($pr.Display) {
-         "List"  { $pr.Details = Get-HTMLList $pr.Details }
-         "Table" { $pr.Details = Get-HTMLTable $pr.Details $pr.TableFormat }
-         "Chart" { $pr.Details = Get-HTMLChart "plugin$($p)" $pr.Details }
-      }
-      $pr | Add-Member -Type NoteProperty -Name pluginID -Value "plugin-$p"
-      $p++
-   }
-}
+    ################################################################################
+    #                                 Script logic                                 #
+    ################################################################################
+    # Start generating the report
+    $PluginResult = @()
 
-# Run Style replacement
-$MyReport = Get-ReportHTML
+    Write-Host $lang.pluginBegin -foreground $host.PrivateData.WarningForegroundColor -background $host.PrivateData.WarningBackgroundColor
+    # Loop over all enabled plugins
+    $p = 0 
+    $vCheckPlugins | Foreach {
+       $TableFormat = $null
+       $PluginInfo = Get-PluginID $_.Fullname
+       $p++
+       Write-CustomOut ($lang.pluginStart -f $PluginInfo['Title'], $PluginInfo['Author'], $PluginInfo['Version'], $p, $vCheckPlugins.count)
+       $pluginStatus = ($lang.pluginStatus -f $p, $vCheckPlugins.count, $_.Name)
+       Write-Progress -ID 1 -Activity $lang.pluginActivity -Status $pluginStatus -PercentComplete (100*$p/($vCheckPlugins.count))
+       $TTR = [math]::round((Measure-Command {$Details = . $_.FullName}).TotalSeconds, 2)
 
-# Set the output filename - if one is specified use it, otherwise just use temp
-if ($Outputpath) {
-   $DateHTML = Get-Date -Format "yyyyMMddHH"
-   $ArchiveFilePath = $Outputpath + "\Archives\" + $VIServer
-   if (-not (Test-Path -PathType Container $ArchiveFilePath)) { New-Item $ArchiveFilePath -type directory | Out-Null }
-   $Filename = $ArchiveFilePath + "\" + $VIServer + "_vCheck_" + $DateHTML + ".htm"
-}
-else {
-   $Filename = $Env:TEMP + "\" + $VIServer + "_vCheck_" + $Date.Day + "-" + $Date.Month + "-" + $Date.Year + ".htm"
-}
+       Write-CustomOut ($lang.pluginEnd -f $PluginInfo['Title'], $PluginInfo['Author'], $PluginInfo['Version'], $p, $vCheckPlugins.count)
+       # Do a replacement for {count} for number of items returned in $header
+       $Header = $Header -replace '\[count\]', $Details.count
 
-# Always generate the report with embedded images
-$embedReport = $MyReport
-# Loop over all CIDs and replace them
-Foreach ($cid in $global:ReportResources.Keys) {
-   $embedReport = $embedReport -replace ("cid:{0}" -f $cid), (Get-ReportResource $cid -ReturnType "embed")
-}
-$embedReport | Out-File -encoding ASCII -filepath $Filename
+       $PluginResult += New-Object PSObject -Property @{'Title' = $Title;
+                                                        'Author' = $PluginInfo['Author'];
+                                                        'Version' = $PluginInfo['Version'];
+                                                        'Details' = $Details;
+                                                        'Display' = $Display;
+                                                        'TableFormat' = $TableFormat;
+                                                        'Header' = $Header;
+                                                        'Comments' = $Comments;
+                                                        'TimeToRun' = $TTR; }
+    }
+    Write-Progress -ID 1 -Activity $lang.pluginActivity -Status $lang.Complete -Completed
 
-# Display to screen
-if ($DisplayToScreen -and (!($emptyReport -and !$DisplayReportEvenIfEmpty))) {
-   Write-CustomOut $lang.HTMLdisp
-   Invoke-Item $Filename
-}
+    # Add report on plugins
+    if ($reportOnPlugins) {
+       $Comments = 'Plugins in numerical order'
+       $Plugins = @()
+       foreach ($Plugin in (Get-ChildItem $PluginsFolder -Include *.ps1, *.ps1.disabled -Recurse)) { 
+          $Plugins += New-Object PSObject -Property @{'Name' = (Get-PluginID  $Plugin.FullName).Title;
+                                                      'Enabled' = (($vCheckPlugins | Select -ExpandProperty FullName) -Contains $plugin.FullName) }
+       }
 
-# Generate email
-if ($SendEmail -and (!($emptyReport -and !$EmailReportEvenIfEmpty))) {
-   Write-CustomOut $lang.emailSend
-   $msg = New-Object System.Net.Mail.MailMessage ($EmailFrom,$EmailTo)
-   # If CC address specified, add
-   If ($EmailCc -ne "") {
-      $msg.CC.Add($EmailCc)
-   }
-   $msg.subject = $EmailSubject
+       if ($ListEnabledPluginsFirst) {
+          $Plugins = $Plugins | Sort -property @{Expression='Enabled';Descending=$true}
+          $Comments = 'Plugins in numerical order, enabled plugins listed first'
+       }
 
-   # if send attachment, just send plaintext email with HTML report attached
-   If ($SendAttachment) {
-      $msg.Body = $lang.emailAtch
-      $attachment = new-object System.Net.Mail.Attachment $Filename
-      $msg.Attachments.Add($attachment)
-   }
-   # Otherwise send the HTML email
-   else {
-      $msg.IsBodyHtml = $true;
-      $html = [System.Net.Mail.AlternateView]::CreateAlternateViewFromString($MyReport,$null,'text/html')
-      $msg.AlternateViews.Add($html)
+       $PluginResult += New-Object PSObject -Property @{'Title' = $lang.repPRTitle;
+                                                        'Author' = 'vCheck';
+                                                        'Version' = $vCheckVersion;
+                                                        'Details' = $Plugins;
+                                                        'Display' = 'Table';
+                                                        'TableFormat' = $null;
+                                                        'Header' = $lang.repPRTitle;
+                                                        'Comments' = $Comments;
+                                                        'TimeToRun' = 0; 
+                                                    }
+    }
 
-      # Loop over all CIDs and replace them
-      Foreach ($cid in $global:ReportResources.Keys) {
-         if ($global:ReportResources[$cid].Uses -gt 0) {
-            $lr = (Get-ReportResource $cid -ReturnType "linkedresource")
-            $html.LinkedResources.Add($lr);
-         }
-      }
-   }
-   # Send the email
-   $smtpClient = New-Object System.Net.Mail.SmtpClient
+    # Add Time to Run detail for plugins - if specified in GlobalVariables.ps1
+    if ($TimeToRun) {
+       $Finished = Get-Date
+       $PluginResult += New-Object PSObject -Property @{'Title' = $lang.repTTRTitle;
+                                                        'Author' = 'vCheck';
+                                                        'Version' = $vCheckVersion;
+                                                        'Details' = ($PluginResult | Where { $_.TimeToRun -gt $PluginSeconds } | Select Title, TimeToRun | Sort-Object TimeToRun -Descending);
+                                                        'Display' = 'List';
+                                                        'TableFormat' = $null;
+                                                        'Header' = ($lang.repTime -f [math]::round(($Finished - $Date).TotalMinutes,2), ($Finished.ToLongDateString()), ($Finished.ToLongTimeString()));
+                                                        'Comments' = ($lang.slowPlugins -f $PluginSeconds);
+                                                        'TimeToRun' = 0; 
+                                                       }
+    }
 
-   # Find the UCS Domain from the global settings file
-   $smtpClient.Host = ($SMTPSRV -Split ":")[0]
-   if (($UcsDomain -split ":")[1]) {
-      $smtpClient.Port = ($UcsDomain -split ":")[1]
-   }
+    ################################################################################
+    #                                    Output                                    #
+    ################################################################################
+    # Loop over plugin results and generate HTML from style
+    $emptyReport = $true
+    $p=1
+    Foreach ( $pr in $PluginResult) {
+       If ($pr.Details) {
+          $emptyReport = $false
+          switch ($pr.Display) {
+             'List'  { $pr.Details = Get-HTMLList $pr.Details }
+             'Table' { $pr.Details = Get-HTMLTable $pr.Details $pr.TableFormat }
+             'Chart' { $pr.Details = Get-HTMLChart "plugin$($p)" $pr.Details }
+          }
+          $pr | Add-Member -Type NoteProperty -Name pluginID -Value "plugin-$p"
+          $p++
+       }
+    }
 
-   if ($EmailSSL -eq $true) {
-      $smtpClient.EnableSsl = $true
-   }
-   $smtpClient.UseDefaultCredentials = $true;
-   $smtpClient.Send($msg)
-   If ($SendAttachment) { $attachment.Dispose() }
-   $msg.Dispose()
-}
+    # Run Style replacement
+    $MyReport = Get-ReportHTML
 
-# Run EndScript once everything else is complete
-if (Test-Path ($ScriptPath + "\EndScript.ps1")) {
-   . ($ScriptPath + "\EndScript.ps1")
+    # Set the output filename - if one is specified use it, otherwise just use temp
+    if ($Outputpath) {
+       $DateHTML = Get-Date -Format 'yyyyMMddHH'
+       $ArchiveFilePath = $Outputpath + '\Archives\' + $VIServer
+       if (-not (Test-Path -PathType Container $ArchiveFilePath)) { New-Item $ArchiveFilePath -type directory | Out-Null }
+       $Filename = $ArchiveFilePath + '\' + $VIServer + '_vCheck_' + $DateHTML + '.htm'
+    }
+    else {
+       $Filename = $Env:TEMP + '\' + $VIServer + '_vCheck_' + $Date.Day + '-' + $Date.Month + '-' + $Date.Year + '.htm'
+    }
+
+    # Always generate the report with embedded images
+    $embedReport = $MyReport
+    # Loop over all CIDs and replace them
+    Foreach ($cid in $global:ReportResources.Keys) {
+       $embedReport = $embedReport -replace ('cid:{0}' -f $cid), (Get-ReportResource $cid -ReturnType 'embed')
+    }
+    $embedReport | Out-File -encoding ASCII -filepath $Filename
+
+    # Display to screen
+    if ($DisplayToScreen -and (!($emptyReport -and !$DisplayReportEvenIfEmpty))) {
+       Write-CustomOut $lang.HTMLdisp
+       Invoke-Item $Filename
+    }
+
+    # Generate email
+    if ($SendEmail -and (!($emptyReport -and !$EmailReportEvenIfEmpty))) {
+       Write-CustomOut $lang.emailSend
+       $msg = New-Object System.Net.Mail.MailMessage ($EmailFrom,$EmailTo)
+       # If CC address specified, add
+       If ($EmailCc -ne '') {
+          $msg.CC.Add($EmailCc)
+       }
+       $msg.subject = $EmailSubject
+
+       # if send attachment, just send plaintext email with HTML report attached
+       If ($SendAttachment) {
+          $msg.Body = $lang.emailAtch
+          $attachment = new-object System.Net.Mail.Attachment $Filename
+          $msg.Attachments.Add($attachment)
+       }
+       # Otherwise send the HTML email
+       else {
+          $msg.IsBodyHtml = $true;
+          $html = [System.Net.Mail.AlternateView]::CreateAlternateViewFromString($MyReport,$null,'text/html')
+          $msg.AlternateViews.Add($html)
+
+          # Loop over all CIDs and replace them
+          Foreach ($cid in $global:ReportResources.Keys) {
+             if ($global:ReportResources[$cid].Uses -gt 0) {
+                $lr = (Get-ReportResource $cid -ReturnType 'linkedresource')
+                $html.LinkedResources.Add($lr);
+             }
+          }
+       }
+       # Send the email
+       $smtpClient = New-Object System.Net.Mail.SmtpClient
+
+       # Find the VI Server and port from the global settings file
+       $smtpClient.Host = ($SMTPSRV -Split ':')[0]
+       if (($server -split ':')[1]) {
+          $smtpClient.Port = ($server -split ':')[1]
+       }
+
+       if ($EmailSSL -eq $true) {
+          $smtpClient.EnableSsl = $true
+       }
+       $smtpClient.UseDefaultCredentials = $true;
+       $smtpClient.Send($msg)
+       If ($SendAttachment) { $attachment.Dispose() }
+       $msg.Dispose()
+    }
+
+    # Run EndScript once everything else is complete
+    if (Test-Path ($ScriptPath + '\EndScript.ps1')) {
+       . ($ScriptPath + '\EndScript.ps1')
+    }
 }
