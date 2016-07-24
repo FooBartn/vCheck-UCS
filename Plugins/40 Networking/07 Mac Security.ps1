@@ -1,4 +1,4 @@
-﻿# Start of Settings
+# Start of Settings
 # Mac Forging (allow/deny):
 $MacForging = 'allow'
 # End of Settings 
