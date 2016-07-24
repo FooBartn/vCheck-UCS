@@ -17,7 +17,10 @@ Import/Export:
 ========================
 Use vCheck.ps1 with Export/Import switches like
 
-.\vCheck.ps1 -Export -
+    .\vCheck.ps1 -Export -SettingsPath C:\TestFile.csv
+    .\vCheck.ps1 -Import -SettingsPath C:\TestFile.csv
+
+This is a new function, please test it out and let me know if you run into any issues.
 
 Requirements to Run:
 ========================
