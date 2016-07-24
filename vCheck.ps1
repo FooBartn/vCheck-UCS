@@ -71,7 +71,7 @@ param (
    [Parameter(Mandatory=$true,ParameterSetName = 'Import')]
    [Parameter(ParameterSetName = 'Export')]
    [ValidateNotNullOrEmpty()]
-   [string]$SettingsFilePath
+   [string]$SettingsPath
 
 )
 $vCheckVersion = '6.23-alpha-3'
@@ -677,10 +677,10 @@ $PluginsFolder = $ScriptPath + '\Plugins\'
 if ($Export) {
    $ExportedSettings = @()
 
-   if (!(Test-Path $SettingsFilePath -ErrorAction SilentlyContinue)) {
-      $ForceCreate = Read-Host "$SettingsFilePath does not currently exist. Create it? (y/n)"
+   if (!(Test-Path $SettingsPath -ErrorAction SilentlyContinue)) {
+      $ForceCreate = Read-Host "$SettingsPath does not currently exist. Create it? (y/n)"
       if ($ForceCreate -eq 'y'){
-        $null = New-Item -Path $SettingsFilePath -ItemType File -Force
+        $null = New-Item -Path $SettingsPath -ItemType File -Force
       } else {
          Throw "Unable to export settings. File does not exist."
       } 
@@ -689,11 +689,11 @@ if ($Export) {
    $ExportedSettings += Export-vCheckSettings -Filename $GlobalVariables
    Foreach ($plugin in $vCheckPlugins) {$ExportedSettings += Export-vCheckSettings -Filename $plugin.Fullname}
 
-   $ExportedSettings | Export-Csv -Path $SettingsFilePath -NoTypeInformation
+   $ExportedSettings | Export-Csv -Path $SettingsPath -NoTypeInformation
 
-   Write-CustomOut "Export Complete: $SettingsFilePath"
+   Write-CustomOut "Export Complete: $SettingsPath"
 } elseif ($Import) {
-   Import-vCheckSettings -ImportFile $SettingsFilePath | Out-GridView
+   Import-vCheckSettings -ImportFile $SettingsPath | Out-GridView
 } else {
     # if we have the job parameter set, get the paths from the config file.
     if ($job) {
