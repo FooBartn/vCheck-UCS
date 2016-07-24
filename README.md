@@ -13,6 +13,11 @@ One of they key things about this report is if there is no issue in a particular
 
 This script is not to be confused with an Audit script, although the reporting framework can also be used for auditing scripts too.  I don't want to remind you that you have 5 hosts and what there names are and how many CPUs they have each and every day as you don't want to read that kind of information unless you need it, this script will only tell you about problem areas with your infrastructure.
 
+Import/Export:
+========================
+Use vCheck.ps1 with Export/Import switches like
+
+.\vCheck.ps1 -Export -
 
 Requirements to Run:
 ========================
@@ -52,6 +57,8 @@ For an example vCheck for UCS output (doesnt contain all info) click here [http:
 
 Changelog
 =========
+* 2.0.7 - Added Import/Export settings functions to vCheck.ps1
+* 2.0.6 - Save credentials to XML for scheduled tasks
 * 2.0.5 - Added Pool Assignment Order plugin.
 * 2.0.4 - Network Control Policies plugin now checks to see where policies are in use
 * 2.0.3 - Added Port Channels to Uplink Flow Control plugin.
