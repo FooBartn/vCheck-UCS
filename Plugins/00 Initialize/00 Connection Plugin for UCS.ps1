@@ -46,19 +46,22 @@ $pLang = DATA {
       
 '@
 }
+
 # Override the default (en) if it exists in lang directory
 Import-LocalizedData -BaseDirectory ($ScriptPath + "\lang") -BindingVariable pLang -ErrorAction SilentlyContinue
 
 # Module Name
 $UcsPowerTool = 'Cisco.UcsManager'
 
+# UCS Cred File
+$UcsCredXml = "$ScriptPath\Credentials\UcsCredentials.xml"
+
 # Load UCS Powertool Module 
 If (!(Get-Module -name $UcsPowerTool -ErrorAction SilentlyContinue)) {
     Import-Module $UcsPowerTool
     
     If (!(Get-Module -name $UcsPowerTool -ErrorAction SilentlyContinue)) {
-        Write-Error $pLang.loadModFailed
-        Throw
+        Throw $pLang.loadModFailed
     } Else {
         Write-CustomOut $pLang.loadModSuccess
     }
@@ -70,11 +73,19 @@ If (!(Get-Module -name $UcsPowerTool -ErrorAction SilentlyContinue)) {
 # Clear Ucs Connections
 Disconnect-Ucs
 
+# Save credentials if they don't exist
+if (!(Test-Path -Path $UcsCredXml)) {
+    $null = Get-Credential | Export-Clixml $UcsCredXml
+}
+
+# Import Credentials
+$UcsCredentials = Import-Clixml $UcsCredXml
+
 # Try connecting to specified domain
 Try {
-    $UcsConnection = Connect-Ucs $UcsDomain -ErrorAction Stop
+    $UcsConnection = Connect-Ucs $UcsDomain -Credential $UcsCredentials -ErrorAction Stop
 } Catch {
-    Write-Error $pLang.connError
+    Throw $pLang.connError
 } Finally {
     If ($UcsConnection) {
         Write-CustomOut $pLang.connOpen
