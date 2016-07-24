@@ -75,7 +75,8 @@ Disconnect-Ucs
 
 # Save credentials if they don't exist
 if (!(Test-Path -Path $UcsCredXml)) {
-    $null = Get-Credential | Export-Clixml $UcsCredXml
+    $null = New-Item -Path $UcsCredXml -ItemType File -Force
+    $null = Get-Credential | Export-Clixml $UcsCredXml -Force
 }
 
 # Import Credentials
