@@ -63,6 +63,7 @@ If (!(Get-Module -name $UcsPowerTool -ErrorAction SilentlyContinue)) {
         Write-CustomOut $pLang.loadModSuccess
     }
 } else {
+    # Module was already loaded
     Write-CustomOut $pLang.loadModExists
 }
 
