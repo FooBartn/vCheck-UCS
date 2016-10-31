@@ -49,10 +49,10 @@ $pLang = DATA {
 Import-LocalizedData -BaseDirectory ($ScriptPath + "\lang") -BindingVariable pLang -ErrorAction SilentlyContinue
 
 # Load UCS Powertool Module 
-If (!(Get-Module -name CiscoUcsPS -ErrorAction SilentlyContinue)) {
-    Import-Module CiscoUcsPs
+If (!(Get-Module -name Cisco.UCSManager -ErrorAction SilentlyContinue)) {
+    Import-Module Cisco.UCSManager
     
-    If (!(Get-Module -name CiscoUcsPS -ErrorAction SilentlyContinue)) {
+    If (!(Get-Module -name Cisco.UCSManager -ErrorAction SilentlyContinue)) {
 		Write-Error $pLang.loadModFailed
 		Throw
     } Else {
